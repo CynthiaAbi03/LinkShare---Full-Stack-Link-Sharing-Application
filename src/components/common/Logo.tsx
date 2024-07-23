@@ -11,7 +11,7 @@ const Logo = () => {
         width={40}
         height={40}
       />
-      <p className="font-bold text-lg text-darkGrey">devlinks</p>
+      <p className="font-bold text-lg text-darkGrey leading-150">devlinks</p>
     </div>
   );
 };

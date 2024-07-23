@@ -44,6 +44,7 @@ const config: Config = {
       },
       fontWeight: {
         'bold': "var(--bold)",
+        'semibold': "var(--semibold)",
         'regular' : "var(--regular)",
       },
       lineHeight: {

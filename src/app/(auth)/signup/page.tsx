@@ -4,7 +4,7 @@ import SignUpForm from '@/components/common/SignUpForm'
 const SignUp : React.FC = () => {
   return (
     <div>
-        <SignUpForm/>
+       <SignUpForm/>
     </div>
   )
 }
