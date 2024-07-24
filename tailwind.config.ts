@@ -16,6 +16,7 @@ const config: Config = {
         themeGrey: "hsl(var(--themeGrey))",
         border: "hsl(var(--border))",
         lightGrey: "hsl(var(--lightGrey))",
+        lightGrey2: "hsl(var(--lightGrey2))",
         white: "hsl(var(--white))",
         redTheme: "hsl(var(--redTheme))",
         github: "hsl(var(--github))",

@@ -6,7 +6,7 @@ const Logo = () => {
   return (
     <div className="flex items-center gap-2">
       <Image
-        src="/devlinkLogo.svg"
+        src="/svg/devlinkLogo.svg"
         alt="devlinks logo"
         width={40}
         height={40}

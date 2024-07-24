@@ -2,6 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
+*,*::before, *::after{
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
 @layer base {
   :root {
     --purplePrimary: 252, 100%, 62%;
@@ -11,6 +20,7 @@
     --themeGrey: 0, 0%, 45%;
     --border: 0,0%,85%;
     --lightGrey: 0, 0%, 98%;
+    --lightGrey2:0, 0%, 93%;
     --white: 0, 0%, 100%;
     --redTheme: 0,100%,61%;
     --radius: 0.5em;
@@ -39,5 +49,13 @@
 .header_container {
   margin: 0 auto;
   max-width: 2200px;
-  padding: 24px
+  padding: 24px;
+  background-color: hsl(var(--lightGrey));
+}
+.body_container {
+  margin: 0 auto;
+  max-width: 2200px;
+  padding: 24px;
+  background-color: hsl(var(--lightGrey));
+  min-height: 100vh;
 }
