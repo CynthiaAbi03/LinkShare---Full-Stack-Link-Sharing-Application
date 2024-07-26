@@ -43,7 +43,7 @@ const LoginForm = () => {
           <div
             className={`w-[395px] flex items-center gap-3 border border-border rounded-lg px-4 py-3 ${activeInput === 'email' ? 'border-purplePrimary shadow-activeShadow' : 'border-border'}`}
           >
-            <Image src="/email.svg" alt="email icon" width={16} height={16} />
+            <Image src="/svg/email.svg" alt="email icon" width={16} height={16} />
             <input
               type="email"
               name="email"
@@ -67,7 +67,7 @@ const LoginForm = () => {
           <div
             className={`w-[395px] flex items-center gap-3 border border-border rounded-lg px-4 py-3 ${activeInput === 'password' ? 'border-purplePrimary shadow-activeShadow' : 'border-border'}`}
           >
-            <Image src="/lock.svg" alt="lock icon" width={16} height={16} />
+            <Image src="/svg/lock.svg" alt="lock icon" width={16} height={16} />
             <input
               type="password"
               name="password"
