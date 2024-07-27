@@ -39,15 +39,14 @@ const ImageUpload: React.FC = () => {
     <div className="w-[60%] flex flex-col gap-3">
       <div className="flex items-center gap-6">
         <div
-          className={`w-[50%] h-[193px]  rounded-[12px] flex flex-col items-center justify-center object-fill object-center relative`}
+          className={`w-[50%] h-[193px]  rounded-[12px] flex flex-col items-center justify-center object-cover object-center relative`}
           style={{
-            backgroundImage: image ? `url(${image})` : 'none',
+            // backgroundImage: image ? `url(${image})` : 'none',
             backgroundColor: !image ? 'rgba(239, 235, 255, 1)' : 'transparent',
           }}
         >
           {!image ? (
             <>
-          
               <NextImage
                 width={40}
                 height={40}
@@ -70,17 +69,26 @@ const ImageUpload: React.FC = () => {
             </>
           ) : (
             <>
-              <div className='bg-black absolute opacity-50 right-6 top-6 rounded-[12px]'></div>
-              <NextImage
-                width={40}
-                height={40}
-                alt="upload image"
-                src="/svg/uploadimagewhite.svg"
-              />
+              {/* <div className='bg-black absolute opacity-50 right-6 top-6 rounded-[12px]'></div> */}
+              <div className='h-full w-full'>
+                <NextImage
+                  width={0}
+                  height={0}
+                  alt="upload image"
+                  src={image}
+                  className='w-full h-full object-cover rounded-xl'
+                />
+              </div>
               <label
                 htmlFor="image-upload"
-                className="text-white cursor-pointer font-semibold leading-150 text-base"
+                className="text-white cursor-pointer font-semibold leading-150 text-base absolute top-[0] bg-black opacity-50 h-full flex flex-col justify-center items-center gap-2 rounded-[12px] w-full "
               >
+                <NextImage
+                  width={40}
+                  height={40}
+                  alt="upload image"
+                  src="/svg/uploadimagewhite.svg"
+                />
                 <input
                   id="image-upload"
                   type="file"

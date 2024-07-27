@@ -25,6 +25,7 @@ body {
     --redTheme: 0,100%,61%;
     --radius: 0.5em;
     --activeShadow: 252,100%,62%,0.25;
+    --defaultShadow: rgba(0,0,0,0.1);
     --github: 0, 0%, 10%, 1;
     --frontendMentor: 0, 0%, 85%;
     --twitter: 198, 79%, 59%;
@@ -51,6 +52,13 @@ body {
   max-width: 2200px;
   padding: 24px;
   background-color: hsl(var(--lightGrey));
+}
+.header_container2{
+  margin: 0 auto;
+  max-width: 2200px;
+  padding: 16px 16px 16px 24px;
+  background-color: white;
+  border-radius: 12px;
 }
 .body_container {
   margin: 0 auto;

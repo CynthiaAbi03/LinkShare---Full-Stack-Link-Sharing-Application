@@ -41,6 +41,7 @@ const config: Config = {
       },
       boxShadow: {
         'activeShadow': '0px 0px 32px 0px hsla(var(--activeShadow))',
+        'defaultShadow': '0px 0px 32px 0px var(--defaultShadow)'
         
       },
       fontWeight: {
