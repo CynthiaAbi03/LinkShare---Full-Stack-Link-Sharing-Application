@@ -1,8 +1,10 @@
 import React from 'react'
+import '@/styles/main.css';
+
 
 const PhonePreview = () => {
   return (
-    <div className="bg-white w-[40%] min-h-screen p-6 flex justify-center pt-[100px] ">
+    <div className="bg-white w-[40%] min-h-screen p-6 flex justify-center pt-[100px] max-sm:hidden custom:hidden">
 
     <div className="relative mx-auto   border-themeGrey  border-[6px] rounded-[2.5rem] h-[640px] w-[300px] shadow-xl">
       <div className="w-[148px] h-[18px] bg-white border border-themeGrey top-0 rounded-b-[1rem] left-1/2 -translate-x-1/2 absolute"></div>

@@ -1,9 +1,12 @@
-import Image from "next/image";
+import LoginForm from "@/components/forms/LoginForm";
+import Logo from "@/components/layout/Logo";
 
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-     <h2 className="font-bold text-purplePrimary">HELLO IS THIS INSTRUMENT SANS</h2>
-    </main>
+    <div className="flex bg-lightGrey flex-col items-center justify-center min-h-screen gap-[50px] max-sm:gap-12 max-sm:bg-white max-sm:p-[0px]">
+      <Logo />
+      <LoginForm/>
+    </div>
+    
   );
 }

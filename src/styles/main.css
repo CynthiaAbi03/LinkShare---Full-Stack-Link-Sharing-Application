@@ -1,0 +1,11 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+    @media (min-width: 768px) and (max-width: 1028px) {
+        .custom-hidden {
+          display: none;
+        }
+    }
+}

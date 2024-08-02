@@ -22,7 +22,7 @@ const Navbar: React.FC = () => {
             width={32}
             height={32}
           />
-          <p className="font-bold text-lg text-darkGrey leading-150">
+          <p className="font-bold text-lg text-darkGrey leading-150 max-sm:hidden">
             devlinks
           </p>
         </div>
@@ -39,7 +39,7 @@ const Navbar: React.FC = () => {
             />
             <p
               className={`${pathname === '/create-link' || hoveredLink === 'create-link' ? 'text-purplePrimary' : 'text-themeGrey'} 
-            }  font-semibold text-md leading-150`}
+            }  font-semibold text-md leading-150 max-sm:hidden`}
             >
               Links
             </p>
@@ -55,7 +55,7 @@ const Navbar: React.FC = () => {
               className={`${pathname === '/profile-details' || hoveredLink === 'profile-details' ? 'fill-purplePrimary' : 'fill-themeGrey'} hover:fill-purplePrimary`}
             />
             <p
-              className={`${pathname === '/profile-details' || hoveredLink === 'profile-details' ? 'text-purplePrimary' : 'text-themeGrey'} font-semibold text-md leading-150 hover:text-purplePrimary transition`}
+              className={`${pathname === '/profile-details' || hoveredLink === 'profile-details' ? 'text-purplePrimary' : 'text-themeGrey'} font-semibold text-md leading-150 hover:text-purplePrimary max-sm:hidden transition`}
             >
               Profile Details
             </p>
@@ -63,10 +63,16 @@ const Navbar: React.FC = () => {
         </div>
 
         <Link
-          className="px-[27px] py-[11px] border border-purplePrimary text-purplePrimary rounded-lg  font-semibold text-md leading-150 my-auto hover:bg-lightPurple transition"
+          className="px-[27px] py-[11px] max-sm:hidden border border-purplePrimary text-purplePrimary rounded-lg  font-semibold text-md leading-150 my-auto hover:bg-lightPurple transition"
           href="/profile-preview"
         >
           Preview
+        </Link>
+        <Link
+          className="px-[22px] hidden py-[11px]  max-sm:block border border-purplePrimary text-purplePrimary rounded-lg  font-semibold text-md leading-150 my-auto hover:bg-lightPurple transition"
+          href="/profile-preview"
+        >
+          <Image src="/svg/eye.svg" alt='preview' width={20} height={20} />
         </Link>
       </div>
     </div>

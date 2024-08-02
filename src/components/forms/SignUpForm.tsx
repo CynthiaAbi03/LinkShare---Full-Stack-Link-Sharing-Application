@@ -28,16 +28,16 @@ const SignUpForm = () => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
   return (
-    <div className="flex flex-col gap-10 bg-white p-[40px]">
+    <div className="flex flex-col gap-10 p-[40px] bg-white w-[476px] max-sm:w-[80%] max-sm:p-0">
       <div className="flex flex-col gap-2">
-        <p className="text-darkGrey font-bold text-lg leading-150">
+        <p className="text-darkGrey font-bold text-lg leading-150 max-sm:text-2xl">
           Create account
         </p>
         <p className="text-themeGrey leading-150 text-md font-regular">
           Let&apos;s get you started sharing your links
         </p>
       </div>
-      <form className="flex flex-col gap-[1.5rem] ">
+      <form className="flex flex-col gap-[1.5rem] max-sm:gap-4">
         <div className="flex flex-col gap-2">
           <label
             htmlFor="email"
@@ -46,9 +46,14 @@ const SignUpForm = () => {
             Email Address
           </label>
           <div
-            className={`w-[395px] flex items-center gap-3 border border-border rounded-lg px-4 py-3 ${activeInput === 'email' ? 'border-purplePrimary shadow-activeShadow' : 'border-border'}`}
+            className={`w-full flex items-center gap-3 border border-border rounded-lg px-4 py-3 ${activeInput === 'email' ? 'border-purplePrimary shadow-activeShadow' : 'border-border'}`}
           >
-            <Image src="/svg/email.svg" alt="email icon" width={16} height={16} />
+            <Image
+              src="/svg/email.svg"
+              alt="email icon"
+              width={16}
+              height={16}
+            />
             <input
               type="email"
               name="email"
@@ -63,14 +68,19 @@ const SignUpForm = () => {
         </div>
 
         <div className="flex flex-col gap-2">
-          <label
-            htmlFor="password"
-            className="font-regular text-md text-darkGrey leading-150"
-          >
-            Password
-          </label>
+          <div className="flex flex-col gap-2">
+            <label
+              htmlFor="password"
+              className="font-regular text-md text-darkGrey leading-150"
+            >
+              Password
+            </label>
+            <p className="font-regular text-[14px] text-themeGrey leading-150">
+              Password must contain at least 8 characters
+            </p>
+          </div>
           <div
-            className={`w-[395px] flex items-center gap-3 border border-border rounded-lg px-4 py-3 ${activeInput === 'password' ? 'border-purplePrimary shadow-activeShadow' : 'border-border'}`}
+            className={`w-full flex items-center gap-3 border border-border rounded-lg px-4 py-3 ${activeInput === 'password' ? 'border-purplePrimary shadow-activeShadow' : 'border-border'}`}
           >
             <Image src="/svg/lock.svg" alt="lock icon" width={16} height={16} />
             <input
@@ -93,7 +103,7 @@ const SignUpForm = () => {
             Confirm password
           </label>
           <div
-            className={`w-[395px] flex items-center gap-3 border border-border rounded-lg px-4 py-3 ${activeInput === 'confirmpassword' ? 'border-purplePrimary shadow-activeShadow' : 'border-border'}`}
+            className={`w-full flex items-center gap-3 border border-border rounded-lg px-4 py-3 ${activeInput === 'confirmpassword' ? 'border-purplePrimary shadow-activeShadow' : 'border-border'}`}
           >
             <Image src="/svg/lock.svg" alt="lock icon" width={16} height={16} />
             <input
@@ -108,9 +118,6 @@ const SignUpForm = () => {
             />
           </div>
         </div>
-        <p className="font-regular text-sm text-themeGrey leading-150">
-          Password must contain at least 8 characters
-        </p>
 
         <button
           type="submit"
@@ -123,7 +130,7 @@ const SignUpForm = () => {
           Already have an account?{' '}
           <Link
             className="text-purplePrimary hover:underline transition"
-            href="/login"
+            href="/"
           >
             Login
           </Link>

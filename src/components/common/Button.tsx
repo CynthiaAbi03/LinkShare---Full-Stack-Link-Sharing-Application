@@ -17,42 +17,55 @@ interface PlatformData {
 }
 
 const platformData: PlatformData = {
-  github: { bgColor: 'github', icon: '/svg/githubw.svg' },
-  twitter: { bgColor: 'twitter', icon: '/svg/twitterw.svg' },
-  frontendMentor: {
+  GITHUB: { bgColor: 'bg-github', icon: '/svg/githubw.svg' },
+  TWITTER: { bgColor: 'bg-twitter', icon: '/svg/twitterw.svg' },
+  FRONTENDMENTOR: {
     bgColor: 'frontendMentor',
     icon: '/svg/frontendmentor2.svg',
   },
-  linkedIn: { bgColor: 'linkedIn', icon: '/svg/linkedinw.svg' },
-  youtube: { bgColor: 'youtube', icon: '/svg/youtubew.svg' },
-  facebook: { bgColor: 'facebook', icon: '/svg/facebookw.svg' },
-  twitch: { bgColor: 'twitch', icon: '/svg/twitchw.svg' },
-  devto: { bgColor: 'devto', icon: '/svg/devtow.svg' },
-  codewars: { bgColor: 'codewars', icon: '/svg/codewarsw.svg' },
-  freeCodeCamp: {
-    bgColor: 'freeCodeCamp',
+  LINKEDIN: { bgColor: 'bg-linkedIn', icon: '/svg/linkedinw.svg' },
+  YOUTUBE: { bgColor: 'bg-youtube', icon: '/svg/youtubew.svg' },
+  FACEBOOK: { bgColor: 'bg-facebook', icon: '/svg/facebookw.svg' },
+  TWITCH: { bgColor: 'bg-twitch', icon: '/svg/twitchw.svg' },
+  DEVTO: { bgColor: 'bg-devto', icon: '/svg/devtow.svg' },
+  CODEWARS: { bgColor: 'bg-codewars', icon: '/svg/codewarsw.svg' },
+  FREECODECAMP: {
+    bgColor: 'bg-freeCodeCamp',
     icon: '/svg/freecodecampw.svg',
   },
-  gitlab: { bgColor: 'gitlab', icon: '/svg/gitlabw.svg' },
-  hashnode: { bgColor: 'hashnode', icon: '/svg/hashnodew.svg' },
-  stackoverflow: {
-    bgColor: 'stackoverflow',
-
+  GITLAB: { bgColor: 'bg-gitlab', icon: '/svg/gitlabw.svg' },
+  HASHNODE: { bgColor: 'bg-hashnode', icon: '/svg/hashnodew.svg' },
+  STACKOVERFLOW: {
+    bgColor: 'bg-stackoverflow',
     icon: '/svg/stackoverflow2.svg',
   },
 };
 const Button = ({ platform, url }: ButtonProps) => {
-  const platformInfo = platformData[platform];
+  const platformInfo = platformData[platform.toUpperCase()];
   if (!platformInfo) {
     return null; // Return null if the platform is not supported
   }
   return (
-    <Link href={url}>
+    <Link href={url} legacyBehavior>
       <a
-        className={`p-2 rounded ${platformInfo.bgColor} text-white flex items-center`}
+        target="_blank"
+        className={` ${platformInfo.bgColor} text-white flex p-4 rounded-lg justify-between items-center`}
       >
-        <Image src={platformInfo.icon} alt={platform} width={24} height={24} />
-        <span className="ml-2">{platform}</span>
+        <div className="flex items-center gap-2">
+          <Image
+            src={platformInfo.icon}
+            alt={platform}
+            width={18}
+            height={18}
+          />
+          <span className="ml-2">{platform}</span>
+        </div>
+        <Image
+          src="/svg/arrow-right.svg"
+          alt="arrow-icon"
+          width={18}
+          height={18}
+        />
       </a>
     </Link>
   );
@@ -60,7 +73,7 @@ const Button = ({ platform, url }: ButtonProps) => {
 
 const SocialLinks: React.FC<{ links: ButtonProps[] }> = ({ links }) => {
   return (
-    <div className="flex flex-wrap gap-4">
+    <div className="flex flex-col gap-4">
       {links.map((link) => (
         <Button key={link.platform} platform={link.platform} url={link.url} />
       ))}

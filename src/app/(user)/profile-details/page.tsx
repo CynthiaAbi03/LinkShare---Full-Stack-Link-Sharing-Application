@@ -8,9 +8,9 @@ const ProfileDetails = () => {
       <div className="flex gap-6 ">
         <PhonePreview />
 
-        <div className="flex flex-col bg-white min-h-screen w-[60%] p-[40px] gap-10">
+        <div className="flex flex-col bg-white min-h-screen w-[60%] p-[40px] max-sm:p-[24px] gap-10 max-sm:w-[100%] custom:w-full">
           <div className="flex flex-col gap-2">
-            <p className="font-bold text-darkGrey text-lg leading-150">
+            <p className="font-bold text-darkGrey text-lg leading-150 max-sm:text-[24px]">
               Profile Details
             </p>
             <p className="text-themeGrey font-normal text-md">
@@ -19,8 +19,8 @@ const ProfileDetails = () => {
             </p>
           </div>
           <div className="flex flex-col gap-6">
-            <div className="bg-lightGrey items-center p-5 rounded-[12px] flex justify-between">
-              <p className="text-themeGrey leading-150 text-md w-[40%]">
+            <div className="bg-lightGrey items-center gap-6 p-5 rounded-[12px] flex  max-sm:flex-col justify-between">
+              <p className="text-themeGrey leading-150 text-md w-[40%] max-sm:w-full">
                 Profile Picture
               </p>
               <ImageUpload/>
@@ -69,8 +69,8 @@ const ProfileDetails = () => {
                 </div>
               </div>
             </div>
-            <div className="flex justify-end py-6 px-10 border-t border-border">
-              <button className="text-white px-[27px] py-[11px] bg-purplePrimary font-semibold rounded-lg">
+            <div className="flex bg-white justify-end fixed bottom-0 z-50 mx-6 right-0 max-sm:mx-6 max-sm:left-0 left-[40%] custom:left-0 custom:mx-10 py-6 px-10 border-t border-border max-sm:justify-normal max-sm:px-0">
+              <button className="text-white  px-[27px] py-[11px] bg-purpleHover font-semibold rounded-lg max-sm:w-full">
                 Save
               </button>
             </div>

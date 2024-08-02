@@ -63,9 +63,21 @@ body {
 .body_container {
   margin: 0 auto;
   max-width: 2200px;
+
   padding: 24px;
   background-color: hsl(var(--lightGrey));
   min-height: 100vh;
 }
 
+@media only screen and (max-width: 640px) {
+  .body_container {
+    padding: 8px;
+  }
+  .header_container {
+    padding: 8px;
+  }
+  .header_container2{
+    padding: 24px;
+  }
+}
 

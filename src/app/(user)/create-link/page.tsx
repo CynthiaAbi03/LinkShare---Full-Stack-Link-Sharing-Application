@@ -147,8 +147,6 @@ const CreateLink = () => {
   };
 
   const addNewLink = () => {
-    setisAddLinkVisible(true);
-
     setLinksTableValue((prev) => [
       ...prev,
       {
@@ -168,13 +166,24 @@ const CreateLink = () => {
     });
   };
 
+  useEffect(() => {
+    if (linksTableValue.length === 0) {
+      setisAddLinkVisible(false);
+    } else {
+      setisAddLinkVisible(true);
+    }
+
+    console.log(linksTableValue.length, 'linksTableValue length');
+    //console.log('addLinkVisible:', addLinkVisible);
+  }, [linksTableValue]);
+
   return (
     <div className="body_container">
-      <div className="flex gap-6 ">
-        <PhonePreview/>
-        <div className="flex flex-col bg-white miin-h-screen w-[60%] p-[40px] gap-10">
+      <div className="flex gap-6 max-sm:flex-col">
+        <PhonePreview />
+        <div className="flex flex-col bg-white w-[60%] min-h-screen p-[40px] gap-10 max-sm:w-[100%] custom:w-[100%] max-sm:p-[24px] ">
           <div className="flex flex-col gap-2">
-            <p className="font-bold text-darkGrey text-lg">
+            <p className="font-bold text-darkGrey text-lg max-sm:text-[24px]">
               Customize your links
             </p>
             <p className="text-themeGrey font-regular text-md">
@@ -183,7 +192,7 @@ const CreateLink = () => {
             </p>
           </div>
 
-          <div className="flex max-h-[1000px] flex-col gap-8">
+          <div className="flex max-h-screen flex-col gap-8">
             <button
               onClick={addNewLink}
               className="w-full  py-[11px] px-[27px] border border-purplePrimary text-purplePrimary rounded-lg font-semibold leading-150 text-center hover:bg-lightPurple transition"
@@ -192,7 +201,7 @@ const CreateLink = () => {
             </button>
 
             {addLinkVisible ? (
-              <div className="w-full gap-6 flex h-[60%] flex-col overflow-auto">
+              <div className="w-full gap-6 flex h-full mb-16 flex-col overflow-auto">
                 {linksTableValue &&
                   linksTableValue.map((item, index) => (
                     <div
@@ -301,10 +310,10 @@ const CreateLink = () => {
                                   padding: '0px 12px',
                                   backgroundColor: 'white',
                                   '&:hover': {
-                                    backgroundColor: 'white', 
+                                    backgroundColor: 'white',
                                   },
                                   '&.Mui-selected': {
-                                    backgroundColor: 'white', 
+                                    backgroundColor: 'white',
                                   },
                                 }}
                                 key={index}
@@ -366,8 +375,8 @@ const CreateLink = () => {
               <GettingStarted />
             )}
 
-            <div className="flex justify-end py-6 px-10 border-t border-border">
-              <button className="text-white px-[27px] py-[11px] bg-purpleHover font-semibold rounded-lg">
+            <div className="flex bg-white justify-end fixed bottom-0 z-50 mx-6 right-0 max-sm:mx-6 max-sm:left-0 left-[40%] custom:left-0 custom:mx-10 py-6 px-10 border-t border-border max-sm:justify-normal max-sm:px-0">
+              <button className="text-white  px-[27px] py-[11px] bg-purpleHover font-semibold rounded-lg max-sm:w-full">
                 Save
               </button>
             </div>

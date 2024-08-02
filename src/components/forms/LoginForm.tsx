@@ -25,9 +25,9 @@ const LoginForm = () => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
   return (
-    <div className="flex flex-col gap-10 bg-white p-[40px]">
+    <div className="flex flex-col gap-10 p-[40px] bg-white w-[476px] max-sm:w-[80%] max-sm:p-0">
       <div className="flex flex-col gap-2">
-        <p className="text-darkGrey font-bold text-lg leading-150">Login</p>
+        <p className="text-darkGrey font-bold text-lg leading-150 max-sm:text-2xl">Login</p>
         <p className="text-themeGrey leading-150 text-md font-regular">
           Add your details below to get back into the app
         </p>
@@ -41,7 +41,7 @@ const LoginForm = () => {
             Email Address
           </label>
           <div
-            className={`w-[395px] flex items-center gap-3 border border-border rounded-lg px-4 py-3 ${activeInput === 'email' ? 'border-purplePrimary shadow-activeShadow' : 'border-border'}`}
+            className={`max-sm: w-full  flex items-center gap-3 border border-border rounded-lg px-4 py-3 ${activeInput === 'email' ? 'border-purplePrimary shadow-activeShadow' : 'border-border'}`}
           >
             <Image src="/svg/email.svg" alt="email icon" width={16} height={16} />
             <input
@@ -65,7 +65,7 @@ const LoginForm = () => {
             Password
           </label>
           <div
-            className={`w-[395px] flex items-center gap-3 border border-border rounded-lg px-4 py-3 ${activeInput === 'password' ? 'border-purplePrimary shadow-activeShadow' : 'border-border'}`}
+            className={`w-full flex items-center gap-3 border border-border rounded-lg px-4 py-3 ${activeInput === 'password' ? 'border-purplePrimary shadow-activeShadow' : 'border-border'}`}
           >
             <Image src="/svg/lock.svg" alt="lock icon" width={16} height={16} />
             <input

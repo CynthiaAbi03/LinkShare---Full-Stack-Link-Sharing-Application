@@ -1,4 +1,5 @@
 import type { Config } from "tailwindcss";
+import defaultTheme from 'tailwindcss/defaultTheme';
 
 const config: Config = {
   content: [
@@ -32,7 +33,6 @@ const config: Config = {
         gitlab: "hsl(var(--gitlab))",
         hashnode: "hsl(var(--hashnode))",
         stackoverflow: "hsl(var(--stackoverflow))",
-
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -41,8 +41,7 @@ const config: Config = {
       },
       boxShadow: {
         'activeShadow': '0px 0px 32px 0px hsla(var(--activeShadow))',
-        'defaultShadow': '0px 0px 32px 0px var(--defaultShadow)'
-        
+        'defaultShadow': '0px 0px 32px 0px var(--defaultShadow)',
       },
       fontWeight: {
         'bold': "var(--bold)",
@@ -55,11 +54,16 @@ const config: Config = {
       fontSize: {
         'lg' : "2rem",
         'md' : "1rem",
-        'sm' : "0.75rem"
-
+        'sm' : "0.75rem",
+      },
+      screens: {
+        'max-sm': {'max': '640px'},
+        'custom': {'min': '768px', 'max': '1028px'},
+        ...defaultTheme.screens,
       }
     },
   },
   plugins: [],
 };
+
 export default config;
