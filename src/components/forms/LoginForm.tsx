@@ -2,8 +2,23 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useForm, type FieldValues } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { loginSchema, TLoginSchema } from '@/lib/types';
+import Loader from '../common/Loader';
+import { z } from 'zod';
 
 const LoginForm = () => {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    reset,
+    getValues,
+  } = useForm<TLoginSchema>({
+    mode: 'onSubmit',
+    resolver: zodResolver(loginSchema),
+  });
   const [activeInput, setActiveInput] = useState<string | null>(null);
 
   const handleFocus = (name: string) => {
@@ -13,26 +28,37 @@ const LoginForm = () => {
   const handleBlur = () => {
     setActiveInput(null);
   };
-  type Form = {
-    email: string;
-    password: string;
+ 
+  const onSubmit = async (data : TLoginSchema) => {
+
+    await new Promise((resolve) => setTimeout(resolve, 5000));
   };
-  const [form, setForm] = useState<Form>({
-    email: '',
-    password: '',
-  });
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-  };
+
+  // type Form = {
+  //   email: string;
+  //   password: string;
+  // };
+  // const [form, setForm] = useState<Form>({
+  //   email: '',
+  //   password: '',
+  // });
+
+  // const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  // };
+
   return (
     <div className="flex flex-col gap-10 p-[40px] bg-white w-[476px] max-sm:w-[80%] max-sm:p-0">
       <div className="flex flex-col gap-2">
-        <p className="text-darkGrey font-bold text-lg leading-150 max-sm:text-2xl">Login</p>
+        <p className="text-darkGrey font-bold text-lg leading-150 max-sm:text-2xl">
+          Login
+        </p>
         <p className="text-themeGrey leading-150 text-md font-regular">
           Add your details below to get back into the app
         </p>
       </div>
-      <form className="flex flex-col gap-[1.5rem] ">
+
+      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-[1.5rem] ">
         <div className="flex flex-col gap-2">
           <label
             htmlFor="email"
@@ -41,20 +67,27 @@ const LoginForm = () => {
             Email Address
           </label>
           <div
-            className={`max-sm: w-full  flex items-center gap-3 border border-border rounded-lg px-4 py-3 ${activeInput === 'email' ? 'border-purplePrimary shadow-activeShadow' : 'border-border'}`}
+            className={`max-sm: w-full  flex items-center gap-3 border border-border rounded-lg px-4 py-3 ${errors.email && 'border-redTheme shadow-none'} ${activeInput === 'email' ? 'border-purplePrimary shadow-activeShadow' : 'border-border'}`}
           >
-            <Image src="/svg/email.svg" alt="email icon" width={16} height={16} />
+            <Image
+              src="/svg/email.svg"
+              alt="email icon"
+              width={16}
+              height={16}
+            />
             <input
               type="email"
-              name="email"
+              {...register('email')}
               id="email"
-              onChange={handleChange}
               onFocus={() => handleFocus('email')}
               onBlur={handleBlur}
               placeholder="e.g alex@email.com"
               className="placeholder:text-md w-full placeholder:font-regular placeholder:leading-150 placeholder:ext-darkGrey outline-none"
             />
           </div>
+          {errors.email && (
+            <p className="text-redTheme">{errors.email.message}</p>
+          )}
         </div>
 
         <div className="flex flex-col gap-2">
@@ -65,27 +98,33 @@ const LoginForm = () => {
             Password
           </label>
           <div
-            className={`w-full flex items-center gap-3 border border-border rounded-lg px-4 py-3 ${activeInput === 'password' ? 'border-purplePrimary shadow-activeShadow' : 'border-border'}`}
+            className={`w-full flex items-center gap-3 border border-border rounded-lg px-4 py-3 ${errors.password && 'border-redTheme shadow-none'} ${activeInput === 'password' ? 'border-purplePrimary shadow-activeShadow' : 'border-border'}`}
           >
             <Image src="/svg/lock.svg" alt="lock icon" width={16} height={16} />
             <input
               type="password"
-              name="password"
+              {...register('password')}
               id="password"
-              onChange={handleChange}
               onFocus={() => handleFocus('password')}
               onBlur={handleBlur}
               placeholder="Enter your password"
               className="w-full placeholder:text-md placeholder:font-regular placeholder:leading-150 placeholder:ext-darkGrey outline-none"
             />
           </div>
+          {errors.password && (
+            <p className="text-redTheme">{errors.password.message}</p>
+          )}
         </div>
 
         <button
           type="submit"
-          className="cursor-pointer bg-purplePrimary text-semibold text-white rounded-lg px-[27px] py-[11px] leading-150 hover:bg-purpleHover transition"
+          disabled={isSubmitting}
+          className="cursor-pointer disabled:bg-purpleDisabled bg-purplePrimary text-semibold text-white rounded-lg px-[27px] py-[11px] leading-150 hover:bg-purpleHover transition"
         >
-          Login
+          <p className="flex items-center justify-center gap-4">
+            {isSubmitting && <Loader />}
+            Login
+          </p>
         </button>
 
         <p className="text-themeGrey text-md line-150 text-center">

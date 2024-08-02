@@ -12,6 +12,7 @@ const config: Config = {
       colors: {
         purplePrimary: "hsl(var(--purplePrimary))",
         purpleHover: "hsl(var(--purpleHover))",
+        purpleDisabled: "hsl(var(--purpleDisabled))",
         lightPurple: "hsl(var(--lightPurple))",
         darkGrey: "hsl(var(--darkGrey))",
         themeGrey: "hsl(var(--themeGrey))",

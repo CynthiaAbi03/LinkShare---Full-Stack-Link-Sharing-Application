@@ -3,8 +3,23 @@ import React, { useEffect } from 'react';
 import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm, type FieldValues } from 'react-hook-form';
+import { z } from 'zod';
+import { signUpSchema, TSignUpSchema } from '@/lib/types';
+import Loader from '../common/Loader';
 
 const SignUpForm = () => {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    reset,
+    getValues,
+  } = useForm<TSignUpSchema>({
+    mode: 'onSubmit',
+    resolver: zodResolver(signUpSchema),
+  });
   const [activeInput, setActiveInput] = useState<string | null>(null);
 
   const handleFocus = (name: string) => {
@@ -14,19 +29,25 @@ const SignUpForm = () => {
   const handleBlur = () => {
     setActiveInput(null);
   };
-  type Form = {
-    email: string;
-    password: string;
-    confirmPassword: string;
+
+  const onSubmit = async (data: TSignUpSchema) => {
+    await new Promise((resolve) => setTimeout(resolve, 10000));
+    reset();
   };
-  const [form, setForm] = useState<Form>({
-    email: '',
-    password: '',
-    confirmPassword: '',
-  });
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-  };
+
+  // type Form = {
+  //   email: string;
+  //   password: string;
+  //   confirmPassword: string;
+  // };
+  // const [form, setForm] = useState<Form>({
+  //   email: '',
+  //   password: '',
+  //   confirmPassword: '',
+  // });
+  // const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  // };
   return (
     <div className="flex flex-col gap-10 p-[40px] bg-white w-[476px] max-sm:w-[80%] max-sm:p-0">
       <div className="flex flex-col gap-2">
@@ -37,7 +58,10 @@ const SignUpForm = () => {
           Let&apos;s get you started sharing your links
         </p>
       </div>
-      <form className="flex flex-col gap-[1.5rem] max-sm:gap-4">
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="flex flex-col gap-[1.5rem] max-sm:gap-4"
+      >
         <div className="flex flex-col gap-2">
           <label
             htmlFor="email"
@@ -45,8 +69,9 @@ const SignUpForm = () => {
           >
             Email Address
           </label>
+
           <div
-            className={`w-full flex items-center gap-3 border border-border rounded-lg px-4 py-3 ${activeInput === 'email' ? 'border-purplePrimary shadow-activeShadow' : 'border-border'}`}
+            className={`w-full flex items-center gap-3 border border-border rounded-lg px-4 py-3 ${errors.email && 'border-redTheme shadow-none'} ${activeInput === 'email' ? 'border-purplePrimary shadow-activeShadow' : 'border-border'}`}
           >
             <Image
               src="/svg/email.svg"
@@ -55,16 +80,17 @@ const SignUpForm = () => {
               height={16}
             />
             <input
+              {...register('email')}
               type="email"
-              name="email"
-              id="email"
               onFocus={() => handleFocus('email')}
               onBlur={handleBlur}
-              onChange={handleChange}
               placeholder="e.g alex@email.com"
               className=" w-full placeholder:text-md placeholder:font-regular placeholder:leading-150 placeholder:ext-darkGrey outline-none"
             />
           </div>
+          {errors.email && (
+            <p className="text-redTheme">{errors.email.message}</p>
+          )}
         </div>
 
         <div className="flex flex-col gap-2">
@@ -75,25 +101,30 @@ const SignUpForm = () => {
             >
               Password
             </label>
-            <p className="font-regular text-[14px] text-themeGrey leading-150">
-              Password must contain at least 8 characters
-            </p>
+
+            {!errors?.password && (
+              <p className="font-regular text-[14px] text-themeGrey leading-150">
+                Password must contain at least 6 characters
+              </p>
+            )}
           </div>
           <div
-            className={`w-full flex items-center gap-3 border border-border rounded-lg px-4 py-3 ${activeInput === 'password' ? 'border-purplePrimary shadow-activeShadow' : 'border-border'}`}
+            className={`w-full flex items-center gap-3 border border-border rounded-lg px-4 py-3 ${errors.password && 'border-redTheme shadow-none'} ${activeInput === 'password' ? 'border-purplePrimary shadow-activeShadow' : 'border-border'}`}
           >
             <Image src="/svg/lock.svg" alt="lock icon" width={16} height={16} />
             <input
               type="password"
-              name="password"
               id="password"
-              onChange={handleChange}
+              {...register('password')}
               onFocus={() => handleFocus('password')}
               onBlur={handleBlur}
-              placeholder="At least 8 characters"
+              placeholder="Password"
               className=" w-full placeholder:text-md placeholder:font-regular placeholder:leading-150 placeholder:ext-darkGrey outline-none"
             />
           </div>
+          {errors.password && (
+            <p className="text-redTheme">{errors.password.message}</p>
+          )}
         </div>
         <div className="flex flex-col gap-2">
           <label
@@ -102,28 +133,35 @@ const SignUpForm = () => {
           >
             Confirm password
           </label>
+          {errors.confirmPassword && <p>{errors.confirmPassword.message}</p>}
           <div
-            className={`w-full flex items-center gap-3 border border-border rounded-lg px-4 py-3 ${activeInput === 'confirmpassword' ? 'border-purplePrimary shadow-activeShadow' : 'border-border'}`}
+            className={`w-full flex items-center gap-3 border border-border rounded-lg px-4 py-3 ${errors.confirmPassword && 'border-redTheme shadow-none'} ${activeInput === 'confirmpassword' ? 'border-purplePrimary shadow-activeShadow' : 'border-border'}`}
           >
             <Image src="/svg/lock.svg" alt="lock icon" width={16} height={16} />
             <input
               type="confirmPassword"
-              name="confirmPassword"
               id="confirmPassword"
-              onChange={handleChange}
+              {...register('confirmPassword')}
               onFocus={() => handleFocus('confirmpassword')}
               onBlur={handleBlur}
-              placeholder="At least 8 characters"
+              placeholder="Confirm Password"
               className="w-full placeholder:text-md placeholder:font-regular placeholder:leading-150 placeholder:ext-darkGrey outline-none"
             />
           </div>
+          {errors.confirmPassword && (
+            <p className="text-redTheme">{errors.confirmPassword.message}</p>
+          )}
         </div>
 
         <button
           type="submit"
-          className="cursor-pointer bg-purplePrimary text-semibold text-white rounded-lg px-[27px] py-[11px] leading-150 hover:bg-purpleHover transition"
+          disabled={isSubmitting}
+          className="cursor-pointer disabled:bg-purpleDisabled bg-purplePrimary text-semibold text-white rounded-lg px-[27px] py-[11px] leading-150 hover:bg-purpleHover transition"
         >
-          Create new account
+          <p className="flex items-center justify-center gap-4">
+            {isSubmitting && <Loader />}
+            Create new account
+          </p>
         </button>
 
         <p className="text-themeGrey text-md line-150 text-center">
