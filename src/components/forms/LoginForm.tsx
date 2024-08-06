@@ -4,7 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useForm, type FieldValues } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { loginSchema, TLoginSchema } from '@/lib/types';
+import { loginSchema, TLoginSchema } from '../../models/types';
 import Loader from '../common/Loader';
 import { z } from 'zod';
 
@@ -28,10 +28,31 @@ const LoginForm = () => {
   const handleBlur = () => {
     setActiveInput(null);
   };
- 
-  const onSubmit = async (data : TLoginSchema) => {
 
-    await new Promise((resolve) => setTimeout(resolve, 5000));
+  const onSubmit = async (data: TLoginSchema) => {
+    //await new Promise((resolve) => setTimeout(resolve, 5000));
+    const userData = {
+      email: data.email,
+      password: data.password,
+    };
+
+    try {
+      const res = await fetch('http://localhost:3000/api/auth/login', {
+        method: 'POST',
+        body: JSON.stringify(userData),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const data = await res.json();
+      console.log(data, 'response');
+      if (res.status === 200) {
+        alert('Login successful');
+      }
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   // type Form = {
@@ -58,7 +79,10 @@ const LoginForm = () => {
         </p>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-[1.5rem] ">
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="flex flex-col gap-[1.5rem] "
+      >
         <div className="flex flex-col gap-2">
           <label
             htmlFor="email"
@@ -121,17 +145,17 @@ const LoginForm = () => {
           disabled={isSubmitting}
           className="cursor-pointer disabled:bg-purpleDisabled bg-purplePrimary text-semibold text-white rounded-lg px-[27px] py-[11px] leading-150 hover:bg-purpleHover transition"
         >
-          <p className="flex items-center justify-center gap-4">
+          <div className="flex items-center justify-center gap-4">
             {isSubmitting && <Loader />}
             Login
-          </p>
+          </div>
         </button>
 
         <p className="text-themeGrey text-md line-150 text-center">
           Don&apos;t have an account?{' '}
           <Link
             className="text-purplePrimary hover:underline transition"
-            href="/signup"
+            href="/auth/signup"
           >
             Create one
           </Link>

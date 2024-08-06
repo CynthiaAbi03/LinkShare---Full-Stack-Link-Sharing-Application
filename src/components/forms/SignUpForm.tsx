@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm, type FieldValues } from 'react-hook-form';
 import { z } from 'zod';
-import { signUpSchema, TSignUpSchema } from '@/lib/types';
+import { signUpSchema, TSignUpSchema } from '../../models/types';
 import Loader from '../common/Loader';
 
 const SignUpForm = () => {
@@ -31,8 +31,31 @@ const SignUpForm = () => {
   };
 
   const onSubmit = async (data: TSignUpSchema) => {
-    await new Promise((resolve) => setTimeout(resolve, 10000));
-    reset();
+    //await new Promise((resolve) => setTimeout(resolve, 10000));
+
+    const userData = {
+      email: data.email,
+      password: data.password,
+    };
+
+    try {
+      const res = await fetch('http://localhost:3000/api/auth/signup', {
+        method: 'POST',
+        body: JSON.stringify(userData),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const data = await res.json();
+      console.log(data, 'response');
+      if (res.status === 201) {
+        alert('Registration successful');
+      }
+    } catch (err) {
+      console.log(err);
+    }
+    //reset();
   };
 
   // type Form = {
@@ -85,7 +108,7 @@ const SignUpForm = () => {
               onFocus={() => handleFocus('email')}
               onBlur={handleBlur}
               placeholder="e.g alex@email.com"
-              className=" w-full placeholder:text-md placeholder:font-regular placeholder:leading-150 placeholder:ext-darkGrey outline-none"
+              className=" w-full bg-white placeholder:text-md placeholder:font-regular placeholder:leading-150 placeholder:ext-darkGrey outline-none"
             />
           </div>
           {errors.email && (
@@ -119,7 +142,7 @@ const SignUpForm = () => {
               onFocus={() => handleFocus('password')}
               onBlur={handleBlur}
               placeholder="Password"
-              className=" w-full placeholder:text-md placeholder:font-regular placeholder:leading-150 placeholder:ext-darkGrey outline-none"
+              className=" w-full placeholder:text-md placeholder:font-regular placeholder:leading-150 placeholder:text-darkGrey bg-white outline-none"
             />
           </div>
           {errors.password && (
@@ -145,7 +168,7 @@ const SignUpForm = () => {
               onFocus={() => handleFocus('confirmpassword')}
               onBlur={handleBlur}
               placeholder="Confirm Password"
-              className="w-full placeholder:text-md placeholder:font-regular placeholder:leading-150 placeholder:ext-darkGrey outline-none"
+              className="w-full placeholder:text-md bg-white placeholder:font-regular placeholder:leading-150 placeholder:ext-darkGrey outline-none"
             />
           </div>
           {errors.confirmPassword && (
@@ -158,17 +181,17 @@ const SignUpForm = () => {
           disabled={isSubmitting}
           className="cursor-pointer disabled:bg-purpleDisabled bg-purplePrimary text-semibold text-white rounded-lg px-[27px] py-[11px] leading-150 hover:bg-purpleHover transition"
         >
-          <p className="flex items-center justify-center gap-4">
+          <div className="flex items-center justify-center gap-4">
             {isSubmitting && <Loader />}
             Create new account
-          </p>
+          </div>
         </button>
 
         <p className="text-themeGrey text-md line-150 text-center">
           Already have an account?{' '}
           <Link
             className="text-purplePrimary hover:underline transition"
-            href="/"
+            href="/auth/login"
           >
             Login
           </Link>

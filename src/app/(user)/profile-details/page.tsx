@@ -4,7 +4,10 @@ import PhonePreview from '@/components/ui/PhonePreview';
 import React from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { profileDetailsSchema, TProfileDetailsSchema } from '@/lib/types';
+import {
+  profileDetailsSchema,
+  TProfileDetailsSchema,
+} from '../../../models/types';
 import Loader from '@/components/common/Loader';
 
 const ProfileDetails = () => {
@@ -113,10 +116,10 @@ const ProfileDetails = () => {
                   disabled={isSubmitting}
                   className="text-white disabled:bg-purpleDisabled  px-[27px] py-[11px] bg-purplePrimary transition font-semibold rounded-lg max-sm:w-full"
                 >
-                  <p className="flex items-center justify-center gap-4">
+                  <div className="flex items-center justify-center gap-4">
                     {isSubmitting && <Loader />}
                     Save
-                  </p>
+                  </div>
                 </button>
               </div>
             </form>
