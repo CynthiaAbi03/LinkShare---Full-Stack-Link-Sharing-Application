@@ -73,14 +73,14 @@ export async function POST(req: Request) {
     } else {
       // Authentication failed
       return NextResponse.json(
-        { message: 'Invalid credentials' },
+        { message: 'Login or password incorrect' },
         { status: 401 }
       );
     }
   } catch (err) {
     console.error(err);
     return NextResponse.json(
-      { message: 'Internal server error' },
+      { message: err },
       { status: 500 }
     );
   }
