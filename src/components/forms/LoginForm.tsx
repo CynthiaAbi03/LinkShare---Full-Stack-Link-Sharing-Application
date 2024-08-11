@@ -1,14 +1,19 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useForm, type FieldValues } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
 import { loginSchema, TLoginSchema } from '../../models/types';
+import { useRouter } from 'next/navigation';
 import Loader from '../common/Loader';
 import { z } from 'zod';
 
 const LoginForm = () => {
+  const router = useRouter();
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+  const [passwordIsVisible, setPasswordIsVisible] = useState(false);
   const {
     register,
     handleSubmit,
@@ -20,6 +25,7 @@ const LoginForm = () => {
     resolver: zodResolver(loginSchema),
   });
   const [activeInput, setActiveInput] = useState<string | null>(null);
+  const [serverError, setServerError] = useState([]);
 
   const handleFocus = (name: string) => {
     setActiveInput(name);
@@ -27,6 +33,10 @@ const LoginForm = () => {
 
   const handleBlur = () => {
     setActiveInput(null);
+  };
+
+  const handlePasswordVisibility = () => {
+    setPasswordIsVisible(!passwordIsVisible);
   };
 
   const onSubmit = async (data: TLoginSchema) => {
@@ -37,7 +47,7 @@ const LoginForm = () => {
     };
 
     try {
-      const res = await fetch('http://localhost:3000/api/auth/login', {
+      const res = await fetch(`${baseUrl}/api/auth/login`, {
         method: 'POST',
         body: JSON.stringify(userData),
         headers: {
@@ -46,14 +56,28 @@ const LoginForm = () => {
       });
 
       const data = await res.json();
-      console.log(data, 'response');
-      if (res.status === 200) {
-        alert('Login successful');
+
+      //console.log(data, 'data from server');
+      //console.log(res.ok, 'res.ok');
+
+      if (!res.ok) {
+        if (data.errors) {
+          setServerError(data.errors);
+        } else {
+          setServerError(data.message);
+        }
+      } else if (res.status === 200) {
+        //alert('Login successful');
+        router.push('/create-link');
       }
     } catch (err) {
       console.log(err);
     }
   };
+
+  useEffect(() => {
+    console.log(serverError, 'serverError');
+  }, [serverError]);
 
   // type Form = {
   //   email: string;
@@ -122,11 +146,11 @@ const LoginForm = () => {
             Password
           </label>
           <div
-            className={`w-full flex items-center gap-3 border border-border rounded-lg px-4 py-3 ${errors.password && 'border-redTheme shadow-none'} ${activeInput === 'password' ? 'border-purplePrimary shadow-activeShadow' : 'border-border'}`}
+            className={`w-full flex relative items-center gap-3 border border-border rounded-lg px-4 py-3 ${errors.password && 'border-redTheme shadow-none'} ${activeInput === 'password' ? 'border-purplePrimary shadow-activeShadow' : 'border-border'}`}
           >
             <Image src="/svg/lock.svg" alt="lock icon" width={16} height={16} />
             <input
-              type="password"
+              type={passwordIsVisible ? 'text' : 'password'}
               {...register('password')}
               id="password"
               onFocus={() => handleFocus('password')}
@@ -134,6 +158,24 @@ const LoginForm = () => {
               placeholder="Enter your password"
               className="w-full placeholder:text-md placeholder:font-regular placeholder:leading-150 placeholder:ext-darkGrey outline-none"
             />
+            {passwordIsVisible && (
+              <div className="absolute right-2">
+                <AiOutlineEye
+                  color="#737373"
+                  size={24}
+                  onClick={handlePasswordVisibility}
+                />
+              </div>
+            )}
+            {!passwordIsVisible && (
+              <div className="absolute right-2">
+                <AiOutlineEyeInvisible
+                  size={24}
+                  color="#737373"
+                  onClick={handlePasswordVisibility}
+                />
+              </div>
+            )}
           </div>
           {errors.password && (
             <p className="text-redTheme">{errors.password.message}</p>

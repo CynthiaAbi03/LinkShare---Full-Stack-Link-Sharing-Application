@@ -25,13 +25,13 @@ export async function verifyJwtToken(
     return null;
   }
 }
-export async function getJwt() {
-  const cookieStore = cookies();
-  const token = cookieStore.get('token');
 
+export async function getJwt(token: string | undefined): Promise<AuthUser | null> {
+  // const cookieStore = cookies();
+  // const token = cookieStore.get('token');
   if (token) {
     try {
-      const payload = await verifyJwtToken(token.value);
+      const payload = await verifyJwtToken(token);
       if (payload) {
         const authPayload: AuthUser = {
           id: payload.id as string,
@@ -48,6 +48,7 @@ export async function getJwt() {
   }
   return null;
 }
+
 export function setUserDataCookie(userData: User_Public) {
   const cookieStore = cookies();
 

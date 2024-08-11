@@ -1,11 +1,11 @@
 export type User = {
   id: string;
-  firstName: string;
-  lastName: string;
+  firstName: string|null;
+  lastName: string|null;
   email: string;
   password: string;
   salt: string;
-  profilePicture: string;
+  profilePicture: string|null;
   createdAt: Date;
   updatedAt: Date;
 };

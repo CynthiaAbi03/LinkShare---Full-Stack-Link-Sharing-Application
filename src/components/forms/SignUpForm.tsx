@@ -3,13 +3,19 @@ import React, { useEffect } from 'react';
 import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm, type FieldValues } from 'react-hook-form';
+import { useRouter } from 'next/navigation';
 import { z } from 'zod';
 import { signUpSchema, TSignUpSchema } from '../../models/types';
 import Loader from '../common/Loader';
 
 const SignUpForm = () => {
+  const router = useRouter();
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+  const [passwordIsVisible, setPasswordIsVisible] = useState(false);
+  const [serverError, setServerError] = useState([]);
   const {
     register,
     handleSubmit,
@@ -21,7 +27,9 @@ const SignUpForm = () => {
     resolver: zodResolver(signUpSchema),
   });
   const [activeInput, setActiveInput] = useState<string | null>(null);
-
+  const handlePasswordVisibility = () => {
+    setPasswordIsVisible(!passwordIsVisible);
+  };
   const handleFocus = (name: string) => {
     setActiveInput(name);
   };
@@ -39,7 +47,7 @@ const SignUpForm = () => {
     };
 
     try {
-      const res = await fetch('http://localhost:3000/api/auth/signup', {
+      const res = await fetch(`${baseUrl}/api/auth/signup`, {
         method: 'POST',
         body: JSON.stringify(userData),
         headers: {
@@ -48,15 +56,26 @@ const SignUpForm = () => {
       });
 
       const data = await res.json();
-      console.log(data, 'response');
-      if (res.status === 201) {
-        alert('Registration successful');
+      //console.log(data, 'response');
+
+      if (!res.ok) {
+        if (data.errors) {
+          setServerError(data.errors);
+        } else {
+          setServerError(data.message);
+        }
+      } else if (res.status === 201) {
+        //alert('Login successful');
+        router.push('/create-link');
       }
     } catch (err) {
       console.log(err);
     }
     //reset();
   };
+  useEffect(() => {
+    console.log(serverError, 'serverError');
+  }, [serverError]);
 
   // type Form = {
   //   email: string;
@@ -132,11 +151,11 @@ const SignUpForm = () => {
             )}
           </div>
           <div
-            className={`w-full flex items-center gap-3 border border-border rounded-lg px-4 py-3 ${errors.password && 'border-redTheme shadow-none'} ${activeInput === 'password' ? 'border-purplePrimary shadow-activeShadow' : 'border-border'}`}
+            className={`w-full relative flex items-center gap-3 border border-border rounded-lg px-4 py-3 ${errors.password && 'border-redTheme shadow-none'} ${activeInput === 'password' ? 'border-purplePrimary shadow-activeShadow' : 'border-border'}`}
           >
             <Image src="/svg/lock.svg" alt="lock icon" width={16} height={16} />
             <input
-              type="password"
+              type={passwordIsVisible ? 'text' : 'password'}
               id="password"
               {...register('password')}
               onFocus={() => handleFocus('password')}
@@ -144,6 +163,24 @@ const SignUpForm = () => {
               placeholder="Password"
               className=" w-full placeholder:text-md placeholder:font-regular placeholder:leading-150 placeholder:text-darkGrey bg-white outline-none"
             />
+            {passwordIsVisible && (
+              <div className="absolute right-2">
+                <AiOutlineEye
+                  color="#737373"
+                  size={24}
+                  onClick={handlePasswordVisibility}
+                />
+              </div>
+            )}
+            {!passwordIsVisible && (
+              <div className="absolute right-2">
+                <AiOutlineEyeInvisible
+                  size={24}
+                  color="#737373"
+                  onClick={handlePasswordVisibility}
+                />
+              </div>
+            )}
           </div>
           {errors.password && (
             <p className="text-redTheme">{errors.password.message}</p>

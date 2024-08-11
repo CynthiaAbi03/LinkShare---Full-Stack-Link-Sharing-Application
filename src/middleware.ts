@@ -4,10 +4,10 @@ import { verifyJwtToken } from './lib/server/auth';
 
 // List of routes that require authentication
 const authRoutes = [
-  '/app/*',
   '/create-link/*',
   '/profile-details/*',
   '/profile-preview/*',
+  'auth/signup',
 ];
 
 //Function to check if a path matches a pattern with wildcard
@@ -56,7 +56,6 @@ export async function middleware(request: NextRequest) {
     if (!token) {
       return NextResponse.redirect(LOGIN);
     }
-
     try {
       // Decode and verify JWT token
       const payload = await verifyJwtToken(token.value);
@@ -85,6 +84,28 @@ export async function middleware(request: NextRequest) {
 
   // If on the login page, check if the user is already logged in
   if (request.nextUrl.pathname === '/auth/login') {
+    const token = request.cookies.get('token');
+
+    if (token) {
+      try {
+        const payload = await verifyJwtToken(token.value);
+
+        // If payload is valid, set flag to redirect to the app
+        if (payload) {
+          redirectToApp = true;
+        } else {
+          // If payload is invalid, delete the token
+          request.cookies.delete('token');
+        }
+      } catch (error) {
+        // On verification error, delete the token
+        request.cookies.delete('token');
+      }
+    }
+  }
+
+  // If the user is authenticated, prevent access to the signup page
+  if (request.nextUrl.pathname === '/auth/signup') {
     const token = request.cookies.get('token');
 
     if (token) {

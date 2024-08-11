@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { Prisma } from '@prisma/client';
 import { prisma } from '../../../../lib/prisma';
 import { authentification, random } from '@/helpers';
+import { User } from '../../../../models/User.types';
 import { AuthUser } from '../../../../models/User.types';
 import { getJwtSecretKey, setUserDataCookie } from '@/lib/server/auth';
 import { SignJWT } from 'jose';
@@ -22,16 +23,28 @@ export async function POST(req: Request) {
 
   if (!email || !password) {
     errors.push('Email and password are required');
-    return new Response(JSON.stringify({ errors }), { status: 400 });
+    return NextResponse.json(
+      {
+        status: 'error',
+        errors: errors,
+      },
+      { status: 400 }
+    );
   }
 
   if (password.length < 6) {
     errors.push('Password length should be more than 6 characters');
-    return new Response(JSON.stringify({ errors }), { status: 400 });
+    return new Response(
+      JSON.stringify({
+        status: 'error',
+        errors: errors,
+      }),
+      { status: 400 }
+    );
   }
 
-  function getSafeUserData(user: any) {
-    const { password, salt, createdAt, updatedAt, ...safeData } = user;
+  function getSafeUserData(user: User) {
+    const { password, salt, ...safeData } = user;
     return safeData;
   }
 
@@ -57,10 +70,12 @@ export async function POST(req: Request) {
       lastName: user.lastName,
       email: user.email,
       profilePicture: user.profilePicture,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
     })
       .setProtectedHeader({ alg: 'HS256' })
       .setIssuedAt()
-      .setExpirationTime('7d') // Token valid for 7 days
+      .setExpirationTime('1d') // Token valid for 1 day
       .sign(getJwtSecretKey());
 
     const response = NextResponse.json({ success: true, status: 200 });
@@ -68,19 +83,19 @@ export async function POST(req: Request) {
       name: 'token',
       value: token,
       path: '/',
-      maxAge: 60 * 60 * 24 * 30, // Cookie valid for 30 days
+      maxAge: 60 * 60 * 24 * 7, // Cookie valid for 1 week
       httpOnly: true,
       sameSite: 'strict',
     });
 
-    //setUserDataCookie(safeUserData);
+    setUserDataCookie(safeUserData);
 
     return response;
   } catch (err) {
     if (err instanceof Prisma.PrismaClientKnownRequestError) {
       if (err.code === 'P2002') {
         return new Response(
-          JSON.stringify({ message: 'User already exists' }),
+          JSON.stringify({ status: 'error', message: 'User already exists' }),
           { status: 400 }
         );
       }

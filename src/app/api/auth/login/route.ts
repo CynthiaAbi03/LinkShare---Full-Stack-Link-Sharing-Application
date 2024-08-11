@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '../../../../lib/prisma';
 import { authentification } from '@/helpers';
+import { User } from '@/models/User.types';
+
 import { getJwtSecretKey, setUserDataCookie } from '@/lib/server/auth';
 import { SignJWT } from 'jose';
 
@@ -18,16 +20,28 @@ export async function POST(req: Request) {
 
   if (!email || !password) {
     errors.push('Email and password are required');
-    return new Response(JSON.stringify({ errors }), { status: 400 });
+    return new Response(
+      JSON.stringify({
+        status: 'error',
+        errors: errors,
+      }),
+      { status: 400 }
+    );
   }
 
   if (password.length < 6) {
     errors.push('Password length should be more than 6 characters');
-    return new Response(JSON.stringify({ errors }), { status: 400 });
+    return NextResponse.json(
+      {
+        status: 'error',
+        errors: errors,
+      },
+      { status: 400 }
+    );
   }
 
-  function getSafeUserData(user: any) {
-    const { password, salt, createdAt, updatedAt, ...safeData } = user;
+  function getSafeUserData(user: User) {
+    const { password, salt, ...safeData } = user;
     return safeData;
   }
 
@@ -35,7 +49,10 @@ export async function POST(req: Request) {
     const user = await prisma.user.findUnique({ where: { email } });
 
     if (!user) {
-      return NextResponse.json({ message: 'User not found' }, { status: 404 });
+      return NextResponse.json(
+        { status: 'error', message: 'User not found' },
+        { status: 404 }
+      );
     }
 
     const { salt, password: storedPassword } = user;
@@ -54,7 +71,7 @@ export async function POST(req: Request) {
       })
         .setProtectedHeader({ alg: 'HS256' })
         .setIssuedAt()
-        .setExpirationTime('7d') // Token valid for 7 days
+        .setExpirationTime('1d') // Token valid for 1 day
         .sign(getJwtSecretKey());
 
       const response = NextResponse.json({ success: true, status: 200 });
@@ -62,26 +79,23 @@ export async function POST(req: Request) {
         name: 'token',
         value: token,
         path: '/',
-        maxAge: 60 * 60 * 24 * 30, // Cookie valid for 30 days
+        maxAge: 60 * 60 * 24 * 7, // Cookie valid for 1 week
         httpOnly: true,
         sameSite: 'strict',
       });
 
-      //setUserDataCookie(safeUserData); // Set user data in cookie or session
+      setUserDataCookie(safeUserData); // Set user data in cookie or session
 
       return response;
     } else {
       // Authentication failed
       return NextResponse.json(
-        { message: 'Login or password incorrect' },
+        { status: 'error', message: 'Email or Password incorrect' },
         { status: 401 }
       );
     }
   } catch (err) {
     console.error(err);
-    return NextResponse.json(
-      { message: err },
-      { status: 500 }
-    );
+    return NextResponse.json({ message: err }, { status: 500 });
   }
 }

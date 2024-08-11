@@ -1,3 +1,4 @@
+'use client';
 import React, {
   createContext,
   useContext,
@@ -5,47 +6,62 @@ import React, {
   useEffect,
   FunctionComponent,
 } from 'react';
-import { User_Public } from '@/models/User.types';
-import { usePathname } from 'next/navigation';
+import { AuthUser } from '@/models/User.types';
+import { getUserData } from '@/lib/client/auth';
 
 interface AuthContextProps {
   isLoading: boolean;
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
-  logoutCleanup: () => Promise<void>;
-  userData: User_Public | null;
+  logoutCleanup: () => void;
+  userData: AuthUser | null;
   userDataLoaded: boolean;
   loadUserData: () => void;
 }
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
 
-export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const pathname = usePathname();
+interface AppProviderProps {
+  children: React.ReactNode;
+}
+
+export const AuthProvider: FunctionComponent<AppProviderProps> = ({
+  children,
+}) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [userData, setUserData] = useState<User_Public | null>(null);
+  const [userData, setUserData] = useState<AuthUser | null>(null);
   const [userDataLoaded, setUserDataLoaded] = useState<boolean>(false);
-  const [userDataLastLoad, setUserDataLastLoad] = useState<Date>(new Date());
 
   const loadUserData = () => {
     setUserDataLoaded(false);
-    setUserData(userData);
-    setUserDataLoaded(true);
+
+    const data = getUserData();
+
+    if (data) {
+      setUserData(data);
+      setUserDataLoaded(true);
+    } else {
+      console.log('no user data');
+    } //Gets parsed user data from browser cookies
   };
 
-  const logoutCleanup = async () => {
+  const logoutCleanup = () => {
     setUserData(null);
     setUserDataLoaded(false);
   };
 
+  useEffect(() => {
+    loadUserData(); // Load user data on initial load
+  }, []);
+
   return (
     <AuthContext.Provider
       value={{
-        userData,
+        isLoading,
         setIsLoading,
         logoutCleanup,
+        userData,
         userDataLoaded,
         loadUserData,
-        isLoading,
       }}
     >
       {children}

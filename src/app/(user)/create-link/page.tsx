@@ -11,8 +11,11 @@ import LinkIcon from '@/components/common/LinkIcon';
 import path from 'path';
 import { Link } from 'react-router-dom';
 import PhonePreview from '@/components/ui/PhonePreview';
+import { useAuth } from '@/context/AuthContext';
+
 
 const CreateLink = () => {
+  const {userData} = useAuth();
   const [addLinkVisible, setisAddLinkVisible] = useState(false);
   const [activeInput, setActiveInput] = useState<number | null>(null);
 
@@ -37,6 +40,10 @@ const CreateLink = () => {
       },
     },
   };
+
+  useEffect(() => {
+    console.log(userData, 'authuserinfo');
+  }, [userData]);
 
   interface LinkTable {
     platform: string;
