@@ -47,7 +47,7 @@ const SignUpForm = () => {
     };
 
     try {
-      const res = await fetch(`${baseUrl}/api/auth/signup`, {
+      const res = await fetch(`/api/auth/signup`, {
         method: 'POST',
         body: JSON.stringify(userData),
         headers: {

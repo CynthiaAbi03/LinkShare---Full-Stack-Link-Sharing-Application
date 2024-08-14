@@ -83,7 +83,10 @@ export async function middleware(request: NextRequest) {
   let redirectToApp = false;
 
   // If on the login page, check if the user is already logged in
-  if (request.nextUrl.pathname === '/auth/login') {
+  if (
+    request.nextUrl.pathname === '/auth/login' ||
+    request.nextUrl.pathname === '/auth/signup'
+  ) {
     const token = request.cookies.get('token');
 
     if (token) {
@@ -105,26 +108,26 @@ export async function middleware(request: NextRequest) {
   }
 
   // If the user is authenticated, prevent access to the signup page
-  if (request.nextUrl.pathname === '/auth/signup') {
-    const token = request.cookies.get('token');
+  // if (request.nextUrl.pathname === '/auth/signup') {
+  //   const token = request.cookies.get('token');
 
-    if (token) {
-      try {
-        const payload = await verifyJwtToken(token.value);
+  //   if (token) {
+  //     try {
+  //       const payload = await verifyJwtToken(token.value);
 
-        // If payload is valid, set flag to redirect to the app
-        if (payload) {
-          redirectToApp = true;
-        } else {
-          // If payload is invalid, delete the token
-          request.cookies.delete('token');
-        }
-      } catch (error) {
-        // On verification error, delete the token
-        request.cookies.delete('token');
-      }
-    }
-  }
+  //       // If payload is valid, set flag to redirect to the app
+  //       if (payload) {
+  //         redirectToApp = true;
+  //       } else {
+  //         // If payload is invalid, delete the token
+  //         request.cookies.delete('token');
+  //       }
+  //     } catch (error) {
+  //       // On verification error, delete the token
+  //       request.cookies.delete('token');
+  //     }
+  //   }
+  // }
 
   // If redirectToApp flag is set, redirect to the app's create-link page
   if (redirectToApp) {

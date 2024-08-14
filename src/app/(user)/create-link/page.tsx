@@ -41,9 +41,9 @@ const CreateLink = () => {
     },
   };
 
-  useEffect(() => {
-    console.log(userData, 'authuserinfo');
-  }, [userData]);
+  // useEffect(() => {
+  //   console.log(userData, 'authuserinfo');
+  // }, [userData]);
 
   interface LinkTable {
     platform: string;

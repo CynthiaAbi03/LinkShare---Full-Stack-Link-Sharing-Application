@@ -39,7 +39,7 @@ const ImageUpload: React.FC = () => {
     <div className="w-[60%] flex flex-col gap-3 max-sm:w-full">
       <div className="flex items-center gap-6 max-sm:flex-col max-sm:items-start ">
         <div
-          className={`w-[193px] h-[193px] max-sm:w-[193px] custom:w-[300px] rounded-[12px] flex flex-col items-center justify-center object-cover object-center relative`}
+          className={`w-[250px] h-[193px] max-sm:w-[193px] custom:w-[300px] rounded-[12px] flex flex-col items-center justify-center object-cover object-center relative`}
           style={{
             // backgroundImage: image ? `url(${image})` : 'none',
             backgroundColor: !image ? 'rgba(239, 235, 255, 1)' : 'transparent',

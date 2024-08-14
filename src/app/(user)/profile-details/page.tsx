@@ -1,7 +1,7 @@
 'use client';
 import ImageUpload from '@/components/ui/ImageUpload';
 import PhonePreview from '@/components/ui/PhonePreview';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import {
@@ -9,23 +9,93 @@ import {
   TProfileDetailsSchema,
 } from '../../../models/types';
 import Loader from '@/components/common/Loader';
+import NextImage from 'next/image';
+import { useAuth } from '@/context/AuthContext';
 
 const ProfileDetails = () => {
+  const { userData } = useAuth();
+  const id = userData?.id;
+  const [serverError, setServerError] = useState([]);
+  const [image, setImage] = useState<string | null>(null);
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
     reset,
+    setError,
     getValues,
   } = useForm<TProfileDetailsSchema>({
     mode: 'onSubmit',
     resolver: zodResolver(profileDetailsSchema),
   });
+  const profilePictureRegister = register('profilePicture', { required: true });
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const fileType = file.type;
+      const validImageTypes = ['image/jpeg', 'image/png'];
+      if (!validImageTypes.includes(fileType)) {
+        setError('profilePicture', {
+          type: 'manual',
+          message: 'Only PNG or JPG formats are allowed.',
+        });
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const img = new Image();
+        img.src = event.target?.result as string;
+        img.onload = () => {
+          if (img.width > 1024 || img.height > 1024) {
+            setError('profilePicture', {
+              type: 'manual',
+              message: 'Image must be below 1024x1024px.',
+            });
+            return;
+          }
+          setImage(event.target?.result as string);
+          //setError(null);
+        };
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const onSubmit = async (data: TProfileDetailsSchema) => {
-    await new Promise((resolve) => setTimeout(resolve, 10000));
-    reset();
+    const userData = {
+      firstName: data.firstName,
+      lastName: data.lastName,
+      profilePicture: image,
+      email: data.email,
+    };
+    try {
+      const res = await fetch(`api/users/${id}`, {
+        method: 'PATCH',
+        body: JSON.stringify(userData),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const responseData = await res.json();
+      if (!res.ok) {
+        if (responseData.error) {
+          setServerError(responseData.error);
+          console.log(responseData.error);
+        }
+      } else if (responseData.success && responseData.status === 200) {
+        alert('saved successfully');
+      }
+    } catch (err) {
+      console.error(err);
+    }
   };
+
+  useEffect(() => {
+    console.log(userData, 'userData');
+  }, []);
 
   return (
     <div className="body_container">
@@ -43,13 +113,98 @@ const ProfileDetails = () => {
             </p>
           </div>
           <div className="flex flex-col gap-6">
-            <div className="bg-lightGrey items-center gap-6 p-5 rounded-[12px] flex  max-sm:flex-col justify-between">
-              <p className="text-themeGrey leading-150 text-md w-[40%] max-sm:w-full">
-                Profile Picture
-              </p>
-              <ImageUpload />
-            </div>
             <form onSubmit={handleSubmit(onSubmit)}>
+              <div className="bg-lightGrey items-center gap-6 p-5 rounded-[12px] flex  max-sm:flex-col justify-between">
+                <p className="text-themeGrey leading-150 text-md w-[40%] max-sm:w-full">
+                  Profile Picture
+                </p>
+                {/* Image upload */}
+                <div className="w-[60%] flex flex-col gap-3 max-sm:w-full">
+                  <div className="flex items-center gap-6 max-sm:flex-col max-sm:items-start ">
+                    <div
+                      className={`w-[250px] h-[193px] max-sm:w-[193px] custom:w-[300px] rounded-[12px] flex flex-col items-center justify-center object-cover object-center relative`}
+                      style={{
+                        // backgroundImage: image ? `url(${image})` : 'none',
+                        backgroundColor: !image
+                          ? 'rgba(239, 235, 255, 1)'
+                          : 'transparent',
+                      }}
+                    >
+                      {!image ? (
+                        <>
+                          <NextImage
+                            width={40}
+                            height={40}
+                            alt="upload image"
+                            src="/svg/uploadimg.svg"
+                          />
+                          <label
+                            htmlFor="image-upload"
+                            className="text-purplePrimary cursor-pointer font-semibold leading-150 text-base"
+                          >
+                            <input
+                              // {...profilePictureRegister}
+                              {...register('profilePicture', {
+                                onChange: handleImageChange,
+                              })}
+                              id="image-upload"
+                              type="file"
+                              accept="image/png, image/jpeg"
+                              // onChange={(e) => {
+                              //   profilePictureRegister.onChange(e.target.files); // use react hook form method
+                              //   //handleImageChange(e); // my custom method
+                              //   setImage(e.target.files?.[0] || null);
+                              // }}
+                              className="hidden"
+                            />
+                            + Upload Image
+                          </label>
+                        </>
+                      ) : (
+                        <>
+                          {/* <div className='bg-black absolute opacity-50 right-6 top-6 rounded-[12px]'></div> */}
+                          <div className="h-full w-full">
+                            <NextImage
+                              width={193}
+                              height={193}
+                              alt="upload image"
+                              src={image}
+                              className="w-full h-full object-cover rounded-xl"
+                            />
+                          </div>
+                          <label
+                            htmlFor="image-upload"
+                            className="text-white cursor-pointer font-semibold leading-150 text-base absolute top-[0] bg-black opacity-50 h-full flex flex-col justify-center items-center gap-2 rounded-[12px] w-full "
+                          >
+                            <NextImage
+                              width={40}
+                              height={40}
+                              alt="upload image"
+                              src="/svg/uploadimagewhite.svg"
+                            />
+                            <input
+                              id="image-upload"
+                              type="file"
+                              accept="image/png, image/jpeg"
+                              onChange={handleImageChange}
+                              className="hidden"
+                            />
+                            Change Image
+                          </label>
+                        </>
+                      )}
+                    </div>
+                    <p className="text-themeGrey text-[14px] leading-150">
+                      Image must be below 1024x1024px. Use PNG or JPG format.
+                    </p>
+                  </div>
+                  {errors.profilePicture && (
+                    <p className="text-redTheme text-base font-medium">
+                      {errors.profilePicture.message}
+                    </p>
+                  )}
+                </div>
+              </div>
               <div className="bg-lightGrey p-5 rounded-[12px] flex flex-col gap-3 max-sm:mb-10">
                 <div className="flex items-center max-sm:flex-col gap-3 max-sm:items-start ">
                   <label
