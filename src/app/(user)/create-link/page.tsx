@@ -12,10 +12,10 @@ import path from 'path';
 import { Link } from 'react-router-dom';
 import PhonePreview from '@/components/ui/PhonePreview';
 import { useAuth } from '@/context/AuthContext';
-
+import { getUserData } from '@/lib/client/auth';
 
 const CreateLink = () => {
-  const {userData} = useAuth();
+  const { userData } = useAuth();
   const [addLinkVisible, setisAddLinkVisible] = useState(false);
   const [activeInput, setActiveInput] = useState<number | null>(null);
 
@@ -23,6 +23,12 @@ const CreateLink = () => {
     setActiveInput(index);
   };
 
+
+
+  useEffect(() => {
+    const poop = getUserData();
+    console.log(poop, 'userdata poop');
+  },[]);
   const handleBlur = () => {
     setActiveInput(null);
   };
@@ -40,10 +46,6 @@ const CreateLink = () => {
       },
     },
   };
-
-  // useEffect(() => {
-  //   console.log(userData, 'authuserinfo');
-  // }, [userData]);
 
   interface LinkTable {
     platform: string;
@@ -180,9 +182,10 @@ const CreateLink = () => {
       setisAddLinkVisible(true);
     }
 
-    console.log(linksTableValue.length, 'linksTableValue length');
+    //console.log(linksTableValue.length, 'linksTableValue length');
     //console.log('addLinkVisible:', addLinkVisible);
   }, [linksTableValue]);
+
 
   return (
     <div className="body_container">

@@ -19,3 +19,8 @@ export type AuthUser = {
   email: string;
   profilePicture: string | null;
 };
+
+export function getSafeUserData(user: User) {
+  const { password, salt, profilePicture, ...safeData } = user;
+  return safeData;
+}

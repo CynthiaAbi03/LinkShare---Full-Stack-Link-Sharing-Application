@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Instrument_Sans, Inter } from 'next/font/google';
 import { Providers } from './Providers';
 import './globals.css';
+import getCookie from '@/lib/server/userCookie';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -21,9 +22,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <Providers>
-        <body className={instrumentSans.className}>{children}</body>
-      </Providers>
+      {/* <CookieProvider cookie={getCookie()}> */}
+        <Providers>
+          <body className={instrumentSans.className}>{children}</body>
+        </Providers>
+      {/* </CookieProvider> */}
     </html>
   );
 }

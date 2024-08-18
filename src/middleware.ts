@@ -59,7 +59,6 @@ export async function middleware(request: NextRequest) {
     try {
       // Decode and verify JWT token
       const payload = await verifyJwtToken(token.value);
-
       // If verification fails, delete the token and redirect to login
       if (!payload) {
         request.cookies.delete('token');
@@ -138,4 +137,25 @@ export async function middleware(request: NextRequest) {
 
   // If no special handling needed, continue to the next middleware or route handler
   return NextResponse.next();
+}
+
+export async function checkAuthorization(
+  request: NextRequest,
+  next: (payload: any) => Promise<NextResponse>
+) {
+  const token = request.cookies.get('token');
+  if (token) {
+    try {
+      const payload = await verifyJwtToken(token.value);
+      if (payload) {
+        return next(payload);
+      } else {
+        request.cookies.delete('token');
+        return NextResponse.json({ authorized: 'false' }, { status: 401 });
+      }
+    } catch (error) {
+      request.cookies.delete('token');
+      return NextResponse.json({ authorized: 'false' }, { status: 401 });
+    }
+  }
 }

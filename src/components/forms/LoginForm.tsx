@@ -9,6 +9,7 @@ import { loginSchema, TLoginSchema } from '../../models/types';
 import { useRouter } from 'next/navigation';
 import Loader from '../common/Loader';
 import { z } from 'zod';
+import { useAuth } from '@/context/AuthContext';
 
 const LoginForm = () => {
   const router = useRouter();
@@ -69,15 +70,16 @@ const LoginForm = () => {
       } else if (res.status === 200) {
         //alert('Login successful');
         router.push('/create-link');
+        //console.log(data, 'here')
       }
     } catch (err) {
       console.log(err);
     }
   };
 
-  useEffect(() => {
-    console.log(serverError, 'serverError');
-  }, [serverError]);
+  // useEffect(() => {
+  //   console.log(serverError, 'serverError');
+  // }, [serverError]);
 
   // type Form = {
   //   email: string;

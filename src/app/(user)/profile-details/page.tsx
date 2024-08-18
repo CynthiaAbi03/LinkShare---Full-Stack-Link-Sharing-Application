@@ -11,11 +11,17 @@ import {
 import Loader from '@/components/common/Loader';
 import NextImage from 'next/image';
 import { useAuth } from '@/context/AuthContext';
+import Loading from '@/components/common/Loading';
+import { set } from 'zod';
+import errorMap from 'zod/locales/en.js';
+import Error from '@/components/common/Error';
 
 const ProfileDetails = () => {
-  const { userData } = useAuth();
+  const { userData, setReload, userDataLoaded, isLoading, setIsLoading } =
+    useAuth();
   const id = userData?.id;
   const [serverError, setServerError] = useState([]);
+  const [requestError, setRequestError] = useState(false);
   const [image, setImage] = useState<string | null>(null);
   const {
     register,
@@ -23,11 +29,13 @@ const ProfileDetails = () => {
     formState: { errors, isSubmitting },
     reset,
     setError,
+    watch,
     getValues,
   } = useForm<TProfileDetailsSchema>({
     mode: 'onSubmit',
     resolver: zodResolver(profileDetailsSchema),
   });
+
   const profilePictureRegister = register('profilePicture', { required: true });
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -64,40 +72,133 @@ const ProfileDetails = () => {
   };
 
   const onSubmit = async (data: TProfileDetailsSchema) => {
-    const userData = {
+    const reqBodyData = {
       firstName: data.firstName,
       lastName: data.lastName,
       profilePicture: image,
       email: data.email,
     };
     try {
+      setIsLoading(true);
       const res = await fetch(`api/users/${id}`, {
         method: 'PATCH',
-        body: JSON.stringify(userData),
+        body: JSON.stringify(reqBodyData),
         headers: {
           'Content-Type': 'application/json',
         },
       });
 
       const responseData = await res.json();
+
       if (!res.ok) {
         if (responseData.error) {
           setServerError(responseData.error);
-          console.log(responseData.error);
+          setRequestError(true);
+          // console.log(responseData.error);
         }
       } else if (responseData.success && responseData.status === 200) {
         alert('saved successfully');
+        setReload(true);
+        // fetchProfilePicture();
       }
     } catch (err) {
       console.error(err);
+      setRequestError(true);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  useEffect(() => {
-    console.log(userData, 'userData');
-  }, []);
+  // const fetchProfilePicture = async () => {
+  //   try {
+  //     const response = await fetch(`api/users/profilePic`, {
+  //       method: 'GET',
+  //     });
+  //     const responseData = await response.json();
+  //     if (!response.ok) {
+  //       if (responseData.error) {
+  //         setServerError(responseData.error);
+  //       }
+  //       return null;
+  //     } else if (responseData.success && response.status === 200) {
+  //       setImage(responseData.data.profilePicture);
+  //       return responseData.data.profilePicture;
+  //     }
+  //   } catch (error) {
+  //     console.error(error);
+  //   } finally {
+  //   }
+  // };
 
-  return (
+  const loadFormData = async () => {
+    if (!userData) return;
+    //get profile picture
+    try {
+      setIsLoading(true);
+      const response = await fetch(`api/users/profilePic`, {
+        method: 'GET',
+      });
+      const responseData = await response.json();
+      if (!response.ok) {
+        if (responseData.error) {
+          setServerError(responseData.error);
+          setRequestError(true);
+        }
+      } else if (responseData.success && response.status === 200) {
+        setImage(responseData.data.profilePicture);
+
+        // Reset the form only after fetching the profile picture
+        reset({
+          firstName: userData.firstName || '',
+          profilePicture: responseData.data.profilePicture || '',
+          lastName: userData.lastName || '',
+          email: userData.email || '',
+        });
+      }
+    } catch (error) {
+      console.error(error);
+      setRequestError(true);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  function disabledButtonState() {
+    if (isSubmitting) {
+      return true;
+    }
+    const formValues = getValues();
+    const isFirstNameChanged = userData?.firstName === watch('firstName');
+    const isLastNameChanged = userData?.lastName === watch('lastName');
+    const isEmailChanged = userData?.email === watch('email');
+    const isProfilePictureChanged = userData?.profilePicture === image;
+
+    return (
+      isFirstNameChanged &&
+      isEmailChanged &&
+      isLastNameChanged &&
+      isProfilePictureChanged
+    );
+  }
+
+  const disabled = disabledButtonState();
+
+  useEffect(() => {
+    if (userDataLoaded && userData) {
+      loadFormData();
+      console.log('i came in here ... times');
+    }
+  }, [userData]);
+
+  // useEffect(() => {
+  //   console.log(isLoading, 'isLoading');
+  // }, [isLoading]);
+
+  return isLoading ? (
+    <Loading />
+  ) : requestError ? (
+    <Error />
+  ) : (
     <div className="body_container">
       <div className="flex gap-6 ">
         <PhonePreview />
@@ -268,7 +369,13 @@ const ProfileDetails = () => {
               <div className="flex bg-white justify-end mx-6 max-sm:mx-6 max-sm:left-0 left-[40%] custom:left-0 custom:mx-10 py-6 px-10 border-t border-border max-sm:justify-normal max-sm:px-0">
                 <button
                   type="submit"
-                  disabled={isSubmitting}
+                  disabled={
+                    isSubmitting ||
+                    (userData?.firstName === watch('firstName') &&
+                      userData?.lastName === watch('lastName') &&
+                      watch("profilePicture") === image &&
+                      userData?.email === watch('email'))
+                  }
                   className="text-white disabled:bg-purpleDisabled  px-[27px] py-[11px] bg-purplePrimary transition font-semibold rounded-lg max-sm:w-full"
                 >
                   <div className="flex items-center justify-center gap-4">

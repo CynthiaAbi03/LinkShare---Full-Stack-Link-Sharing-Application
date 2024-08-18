@@ -72,7 +72,7 @@ const Navbar: React.FC = () => {
           className="px-[22px] hidden py-[11px]  max-sm:block border border-purplePrimary text-purplePrimary rounded-lg  font-semibold text-md leading-150 my-auto hover:bg-lightPurple transition"
           href="/profile-preview"
         >
-          <Image src="/svg/eye.svg" alt='preview' width={20} height={20} />
+          <Image src="/svg/eye.svg" alt="preview" width={20} height={20} />
         </Link>
       </div>
     </div>

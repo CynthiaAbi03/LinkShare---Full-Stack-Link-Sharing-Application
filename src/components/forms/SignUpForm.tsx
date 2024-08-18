@@ -10,6 +10,7 @@ import { useRouter } from 'next/navigation';
 import { z } from 'zod';
 import { signUpSchema, TSignUpSchema } from '../../models/types';
 import Loader from '../common/Loader';
+import { useAuth } from '@/context/AuthContext';
 
 const SignUpForm = () => {
   const router = useRouter();
@@ -73,9 +74,9 @@ const SignUpForm = () => {
     }
     //reset();
   };
-  useEffect(() => {
-    console.log(serverError, 'serverError');
-  }, [serverError]);
+  // useEffect(() => {
+  //   console.log(serverError, 'serverError');
+  // }, [serverError]);
 
   // type Form = {
   //   email: string;

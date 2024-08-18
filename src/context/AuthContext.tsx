@@ -6,15 +6,19 @@ import React, {
   useEffect,
   FunctionComponent,
 } from 'react';
-import { AuthUser } from '@/models/User.types';
-import { getUserData } from '@/lib/client/auth';
+import { AuthUser, User_Public } from '@/models/User.types';
+import { getUserData, isLoggedIn } from '@/lib/client/auth';
+import { usePathname } from 'next/navigation';
 
 interface AuthContextProps {
   isLoading: boolean;
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
   logoutCleanup: () => void;
   userData: AuthUser | null;
+  setUserData: React.Dispatch<React.SetStateAction<AuthUser | null>>;
   userDataLoaded: boolean;
+  reload: boolean;
+  setReload: React.Dispatch<React.SetStateAction<boolean>>;
   loadUserData: () => void;
 }
 
@@ -24,24 +28,27 @@ interface AppProviderProps {
   children: React.ReactNode;
 }
 
+const USERDATA_TTL = 60 * 5; // 5 minutes
+
 export const AuthProvider: FunctionComponent<AppProviderProps> = ({
   children,
 }) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [userData, setUserData] = useState<AuthUser | null>(null);
+  const [loadUserDataState, setLoadUserDataState] = useState<boolean>(true);
+  const [reload, setReload] = useState(false);
   const [userDataLoaded, setUserDataLoaded] = useState<boolean>(false);
+  const [userDataLastLoad, setUserDataLastLoad] = useState<Date>(new Date());
+  const pathname = usePathname();
 
   const loadUserData = () => {
     setUserDataLoaded(false);
-
-    const data = getUserData();
-
-    if (data) {
-      setUserData(data);
+    try {
+      const userData = getUserData();
+      setUserData(userData);
       setUserDataLoaded(true);
-    } else {
-      console.log('no user data');
-    } //Gets parsed user data from browser cookies
+    } finally {
+    }
   };
 
   const logoutCleanup = () => {
@@ -49,9 +56,52 @@ export const AuthProvider: FunctionComponent<AppProviderProps> = ({
     setUserDataLoaded(false);
   };
 
+  const loadUserDataFromServer = async () => {
+    if (!isLoggedIn()) return;
+
+    try {
+      setIsLoading(true);
+      const response = await fetch('/api/auth');
+      const data = await response.json();
+      const { success } = data;
+      if (!success) {
+        let message = 'Failed to load user data from server';
+        if (data.message) message = data.message;
+        console.error(message);
+        return;
+      }
+      setUserDataLastLoad(new Date());
+    } catch (_) {
+      console.error('Failed to load user data from server');
+    } finally {
+      loadUserData();
+      setIsLoading(false);
+    }
+  };
+
+  // fires on first load
   useEffect(() => {
-    loadUserData(); // Load user data on initial load
+    loadUserDataFromServer();
+    console.log('i ran here ... times load data from server');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (reload) {
+      loadUserDataFromServer();
+      console.log('i ran here ... times load data from server/ reload');
+    }
+  }, [reload]);
+
+  // Fires on page load
+  // useEffect(() => {
+  //   const userData = getUserData();
+  //   setUserData(userData);
+  //   setUserDataLoaded(true);
+  //   // Reload user data from server if USERDATA_TTL has expired
+
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [pathname]);
 
   return (
     <AuthContext.Provider
@@ -59,6 +109,9 @@ export const AuthProvider: FunctionComponent<AppProviderProps> = ({
         isLoading,
         setIsLoading,
         logoutCleanup,
+        setUserData,
+        reload,
+        setReload,
         userData,
         userDataLoaded,
         loadUserData,

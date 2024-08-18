@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '../../../../lib/prisma';
 import { authentification } from '@/helpers';
-import { User } from '@/models/User.types';
+import { getSafeUserData, User } from '@/models/User.types';
+import authConfig from '@/config/authConfig';
 
-import { getJwtSecretKey, setUserDataCookie } from '@/lib/server/auth';
+import { getJwtSecretKey, setJWT, setUserDataCookie } from '@/lib/server/auth';
 import { SignJWT } from 'jose';
 
 export const dynamic = 'force-dynamic';
@@ -40,10 +41,6 @@ export async function POST(req: Request) {
     );
   }
 
-  function getSafeUserData(user: User) {
-    const { password, salt, ...safeData } = user;
-    return safeData;
-  }
 
   try {
     const user = await prisma.user.findUnique({ where: { email } });
@@ -70,20 +67,22 @@ export async function POST(req: Request) {
       })
         .setProtectedHeader({ alg: 'HS256' })
         .setIssuedAt()
-        .setExpirationTime('1d') // Token valid for 1 day
+        .setExpirationTime(authConfig.jwtExpiresString) // Token valid for 1 day
         .sign(getJwtSecretKey());
 
-      const response = NextResponse.json({ success: true, status: 200 });
+      const response = NextResponse.json({ success: true }, { status: 200 });
+
       response.cookies.set({
         name: 'token',
         value: token,
         path: '/',
-        maxAge: 60 * 60 * 24 * 7, // Cookie valid for 1 week
+        maxAge: authConfig.jwtExpires, // Cookie valid for 1 week
         httpOnly: true,
         sameSite: 'strict',
       });
 
       setUserDataCookie(safeUserData); // Set user data in cookie or session
+      setJWT(token); //set token in next/headers cooke
 
       return response;
     } else {

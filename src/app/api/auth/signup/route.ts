@@ -5,8 +5,9 @@ import { prisma } from '../../../../lib/prisma';
 import { authentification, random } from '@/helpers';
 import { User } from '../../../../models/User.types';
 import { AuthUser } from '../../../../models/User.types';
-import { getJwtSecretKey, setUserDataCookie } from '@/lib/server/auth';
+import { getJwtSecretKey, setJWT, setUserDataCookie } from '@/lib/server/auth';
 import { SignJWT } from 'jose';
+import authConfig from '@/config/authConfig';
 
 export const dynamic = 'force-dynamic';
 
@@ -44,12 +45,12 @@ export async function POST(req: Request) {
   }
 
   function getSafeUserData(user: User) {
-    const { password, salt, ...safeData } = user;
+    const { password, salt, profilePicture, ...safeData } = user;
     return safeData;
   }
 
   try {
-    console.log('entered try block');
+    //console.log('entered try block');
 
     const salt = random();
     const hashedPassword = authentification(salt, password);
@@ -75,20 +76,22 @@ export async function POST(req: Request) {
     })
       .setProtectedHeader({ alg: 'HS256' })
       .setIssuedAt()
-      .setExpirationTime('1d') // Token valid for 1 day
+      .setExpirationTime(authConfig.jwtExpiresString) // Token valid for 1 day
       .sign(getJwtSecretKey());
 
-    const response = NextResponse.json({ success: true, status: 200 });
+    const response = NextResponse.json({ success: true }, { status: 200 });
+
     response.cookies.set({
       name: 'token',
       value: token,
       path: '/',
-      maxAge: 60 * 60 * 24 * 7, // Cookie valid for 1 week
+      maxAge: authConfig.jwtExpires, // Cookie valid for 1 week
       httpOnly: true,
       sameSite: 'strict',
     });
 
     setUserDataCookie(safeUserData);
+    setJWT(token);
 
     return response;
   } catch (err) {
