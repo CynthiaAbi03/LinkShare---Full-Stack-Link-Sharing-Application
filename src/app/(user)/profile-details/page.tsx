@@ -17,8 +17,14 @@ import errorMap from 'zod/locales/en.js';
 import Error from '@/components/common/Error';
 
 const ProfileDetails = () => {
-  const { userData, setReload, userDataLoaded, isLoading, setIsLoading } =
-    useAuth();
+  const {
+    userData,
+    setReload,
+    handleSwitchReload,
+    userDataLoaded,
+    isLoading,
+    setIsLoading,
+  } = useAuth();
   const id = userData?.id;
   const [serverError, setServerError] = useState([]);
   const [requestError, setRequestError] = useState(false);
@@ -96,9 +102,10 @@ const ProfileDetails = () => {
           setRequestError(true);
           // console.log(responseData.error);
         }
-      } else if (responseData.success && responseData.status === 200) {
+      } else if (responseData.success) {
         alert('saved successfully');
-        setReload(true);
+        //console.log('i set successdud')
+        handleSwitchReload();
         // fetchProfilePicture();
       }
     } catch (err) {
@@ -188,6 +195,7 @@ const ProfileDetails = () => {
       loadFormData();
       console.log('i came in here ... times');
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userData]);
 
   // useEffect(() => {
@@ -213,9 +221,13 @@ const ProfileDetails = () => {
               Add your details to create a personal touch to your profile
             </p>
           </div>
-          <div className="flex flex-col gap-6">
-            <form onSubmit={handleSubmit(onSubmit)}>
-              <div className="bg-lightGrey items-center gap-6 p-5 rounded-[12px] flex  max-sm:flex-col justify-between">
+
+          <form
+            className="flex flex-col justify-normal gap-10 h-full max-sm:justify-between max-sm:gap-2"
+            onSubmit={handleSubmit(onSubmit)}
+          >
+            <div className="bg-lightGrey p-5 rounded-[12px] flex flex-col gap-3 max-sm:mb-10">
+              <div className="items-center gap-6 p-5 flex  max-sm:flex-col justify-between">
                 <p className="text-themeGrey leading-150 text-md w-[40%] max-sm:w-full">
                   Profile Picture
                 </p>
@@ -306,7 +318,7 @@ const ProfileDetails = () => {
                   )}
                 </div>
               </div>
-              <div className="bg-lightGrey p-5 rounded-[12px] flex flex-col gap-3 max-sm:mb-10">
+              <div className="p-5 flex flex-col gap-3 max-sm:mb-10">
                 <div className="flex items-center max-sm:flex-col gap-3 max-sm:items-start ">
                   <label
                     htmlFor="firstName"
@@ -366,26 +378,27 @@ const ProfileDetails = () => {
                   </div>
                 </div>
               </div>
-              <div className="flex bg-white justify-end mx-6 max-sm:mx-6 max-sm:left-0 left-[40%] custom:left-0 custom:mx-10 py-6 px-10 border-t border-border max-sm:justify-normal max-sm:px-0">
-                <button
-                  type="submit"
-                  disabled={
-                    isSubmitting ||
-                    (userData?.firstName === watch('firstName') &&
-                      userData?.lastName === watch('lastName') &&
-                      watch("profilePicture") === image &&
-                      userData?.email === watch('email'))
-                  }
-                  className="text-white disabled:bg-purpleDisabled  px-[27px] py-[11px] bg-purplePrimary transition font-semibold rounded-lg max-sm:w-full"
-                >
-                  <div className="flex items-center justify-center gap-4">
-                    {isSubmitting && <Loader />}
-                    Save
-                  </div>
-                </button>
-              </div>
-            </form>
-          </div>
+            </div>
+
+            <div className="flex bg-white justify-end mx-6 max-sm:mx-6 max-sm:left-0 left-[40%] custom:left-0 custom:mx-10 py-6 px-10 border-t border-border max-sm:justify-normal max-sm:px-0">
+              <button
+                type="submit"
+                disabled={
+                  isSubmitting ||
+                  (userData?.firstName === watch('firstName') &&
+                    userData?.lastName === watch('lastName') &&
+                    watch('profilePicture') === image &&
+                    userData?.email === watch('email'))
+                }
+                className="text-white disabled:bg-purpleDisabled  px-[27px] py-[11px] bg-purplePrimary transition font-semibold rounded-lg max-sm:w-full"
+              >
+                <div className="flex items-center justify-center gap-4">
+                  {isSubmitting && <Loader />}
+                  Save
+                </div>
+              </button>
+            </div>
+          </form>
         </div>
       </div>
     </div>

@@ -14,21 +14,44 @@ import PhonePreview from '@/components/ui/PhonePreview';
 import { useAuth } from '@/context/AuthContext';
 import { getUserData } from '@/lib/client/auth';
 
+interface LinkTable {
+  platform: string;
+  url: string;
+}
+
+interface Option {
+  src: string;
+  alt: string;
+  value: string;
+}
+
+interface PlatformPatterns {
+  [key: string]: RegExp;
+}
+// Record<string, RegExp>;
+
+interface ErrorPattern {
+  platform?: string;
+  message?: string;
+  valid: boolean;
+}
+
 const CreateLink = () => {
   const { userData } = useAuth();
   const [addLinkVisible, setisAddLinkVisible] = useState(false);
   const [activeInput, setActiveInput] = useState<number | null>(null);
+  const [linksTableValue, setLinksTableValue] = useState<LinkTable[]>([]);
+  const [selectedPlatform, setSelectedPlatform] = useState<Option | null>(null);
+  const [url, setUrl] = useState<string>('');
+  const [error, setError] = useState<ErrorPattern | null>(null);
 
   const handleFocus = (index: number) => {
     setActiveInput(index);
   };
-
-
-
-  useEffect(() => {
-    const poop = getUserData();
-    console.log(poop, 'userdata poop');
-  },[]);
+  // useEffect(() => {
+  //   const poop = getUserData();
+  //   console.log(poop, 'userdata poop');
+  // },[]);
   const handleBlur = () => {
     setActiveInput(null);
   };
@@ -46,17 +69,6 @@ const CreateLink = () => {
       },
     },
   };
-
-  interface LinkTable {
-    platform: string;
-    url: string;
-  }
-
-  interface Option {
-    src: string;
-    alt: string;
-    value: string;
-  }
 
   const options = [
     {
@@ -134,9 +146,54 @@ const CreateLink = () => {
     },
   ];
 
-  const [linksTableValue, setLinksTableValue] = useState<LinkTable[]>([]);
-  const [selectedPlatform, setSelectedPlatform] = useState<Option | null>(null);
-  const [url, setUrl] = useState<string>('');
+  function isValidURL(url: string) {
+    try {
+      new URL(url);
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function validateLink(url: string, platform: string) {
+    const platformPatterns: PlatformPatterns = {
+      github: /^https:\/\/github\.com\//,
+      linkedIn: /^https:\/\/www\.linkedin\.com\//,
+      twitter: /^https:\/\/twitter\.com\//,
+      youTube: /^https:\/\/(www\.)?youtube\.com\//,
+      facebook: /^https:\/\/www\.facebook\.com\//,
+      twitch: /^https:\/\/www\.twitch\.tv\//,
+      'dev.to': /^https:\/\/dev\.to\//,
+      codewars: /^https:\/\/www\.codewars\.com\//,
+      codepen: /^https:\/\/codepen\.io\//,
+      freecodecamp: /^https:\/\/www\.freecodecamp\.org\//,
+      gitlab: /^https:\/\/gitlab\.com\//,
+      hashnode: /^https:\/\/hashnode\.com\//,
+      stackoverflow: /^https:\/\/stackoverflow\.com\//,
+    };
+
+    if (!isValidURL(url)) {
+      return { valid: false, message: 'Invalid URL format.' };
+    }
+
+    const pattern = platformPatterns[platform.toLowerCase()];
+
+    if (pattern && !pattern.test(url)) {
+      setError((prev) => ({
+        ...prev,
+        platform: platform,
+        valid: false,
+        message: `The URL does not match the expected format for ${platform}.`,
+      }));
+
+      return {
+        valid: false,
+      };
+    }
+
+    setError(null);
+    return { valid: true };
+  }
 
   const handleInputChange = (
     index: number,
@@ -186,11 +243,11 @@ const CreateLink = () => {
     //console.log('addLinkVisible:', addLinkVisible);
   }, [linksTableValue]);
 
-
   return (
     <div className="body_container">
       <div className="flex gap-6 max-sm:flex-col">
         <PhonePreview />
+
         <div className="flex flex-col bg-white w-[60%] min-h-screen p-[40px] gap-10 max-sm:w-[100%] custom:w-[100%] max-sm:p-[24px] ">
           <div className="flex flex-col gap-2">
             <p className="font-bold text-darkGrey text-lg max-sm:text-[24px]">

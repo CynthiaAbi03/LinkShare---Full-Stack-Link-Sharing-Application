@@ -20,6 +20,7 @@ interface AuthContextProps {
   reload: boolean;
   setReload: React.Dispatch<React.SetStateAction<boolean>>;
   loadUserData: () => void;
+  handleSwitchReload: () => void;
 }
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
@@ -79,6 +80,10 @@ export const AuthProvider: FunctionComponent<AppProviderProps> = ({
     }
   };
 
+  const handleSwitchReload = () => {
+    setReload(true);
+  };
+
   // fires on first load
   useEffect(() => {
     loadUserDataFromServer();
@@ -87,10 +92,17 @@ export const AuthProvider: FunctionComponent<AppProviderProps> = ({
   }, []);
 
   useEffect(() => {
+
     if (reload) {
       loadUserDataFromServer();
-      console.log('i ran here ... times load data from server/ reload');
+     // console.log('i ran here ... times load data from server/ reload');
     }
+
+    // Cleanup function to set reload to false
+    return () => {
+      setReload(false);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reload]);
 
   // Fires on page load
@@ -108,6 +120,7 @@ export const AuthProvider: FunctionComponent<AppProviderProps> = ({
       value={{
         isLoading,
         setIsLoading,
+        handleSwitchReload,
         logoutCleanup,
         setUserData,
         reload,
